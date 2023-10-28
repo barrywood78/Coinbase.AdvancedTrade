@@ -11,16 +11,9 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<AssemblyVersion>1.0.2</AssemblyVersion>
 	<FileVersion>1.0.2</FileVersion>
-	<Version>1.0.2</Version>
+	<Version>1.0.3</Version>
 
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\..\..\CoinbaseApi\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="RestSharp" Version="110.2.0" />
