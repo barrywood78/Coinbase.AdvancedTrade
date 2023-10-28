@@ -4,7 +4,20 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Coinbase.AdvancedTrade</Title>
+    <PackageProjectUrl>https://github.com/barrywood78/Coinbase.AdvancedTrade</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\CoinbaseApi\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="RestSharp" Version="110.2.0" />
