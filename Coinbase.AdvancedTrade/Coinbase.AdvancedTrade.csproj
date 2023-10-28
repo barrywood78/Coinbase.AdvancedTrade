@@ -9,9 +9,9 @@
     <PackageProjectUrl>https://github.com/barrywood78/Coinbase.AdvancedTrade</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<AssemblyVersion>1.0.1</AssemblyVersion>
-	<FileVersion>1.0.1</FileVersion>
-	<Version>1.0.1</Version>
+	<AssemblyVersion>1.0.2</AssemblyVersion>
+	<FileVersion>1.0.2</FileVersion>
+	<Version>1.0.2</Version>
 
   </PropertyGroup>
 
