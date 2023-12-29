@@ -108,5 +108,18 @@ namespace Coinbase.AdvancedTradeTest.Helpers
 
             return mock;
         }
+
+        // Helper method to initialize a mock of ICommonManager
+        public static Mock<ICommonManager> InitializeCommonMock()
+        {
+            var mock = new Mock<ICommonManager>();
+
+            // Set up mock behavior for GetCoinbaseServerTimeAsync
+            mock.Setup(c => c.GetCoinbaseServerTimeAsync())
+                .ReturnsAsync(MockDataHelper.GetMockServerTime());
+
+            return mock;
+        }
+
     }
 }

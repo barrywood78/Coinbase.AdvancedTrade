@@ -408,8 +408,19 @@ namespace Coinbase.AdvancedTradeTest.Helpers
         }
 
 
-
-
+        /// <summary>
+        /// Gets mock server time data for testing purposes.
+        /// </summary>
+        /// <returns>A mock ServerTime object.</returns>
+        public static ServerTime GetMockServerTime()
+        {
+            return new ServerTime
+            {
+                Iso = "2023-11-28T00:00:22Z",
+                EpochSeconds = "1701129622",
+                EpochMillis = "1701129622115"
+            };
+        }
 
 
 

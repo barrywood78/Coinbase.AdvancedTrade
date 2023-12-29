@@ -29,6 +29,11 @@ namespace Coinbase.AdvancedTrade
         public IFeesManager Fees { get; }
 
         /// <summary>
+        /// Gets the common manager, responsible for common-related operations.
+        /// </summary>
+        public ICommonManager Common { get; }
+
+        /// <summary>
         /// Gets the WebSocket manager, responsible for managing WebSocket connections.
         /// </summary>
         public WebSocketManager? WebSocket { get; }
@@ -45,6 +50,7 @@ namespace Coinbase.AdvancedTrade
             Products = new ProductsManager(authenticator);
             Orders = new OrdersManager(authenticator);
             Fees = new FeesManager(authenticator);
+            Common = new CommonManager(authenticator);
             WebSocket = new WebSocketManager("wss://advanced-trade-ws.coinbase.com", apiKey, apiSecret);
         }
 
@@ -55,12 +61,13 @@ namespace Coinbase.AdvancedTrade
         /// <param name="products">The mock or stub products manager for testing.</param>
         /// <param name="orders">The mock or stub orders manager for testing.</param>
         /// <param name="fees">The mock or stub fees manager for testing.</param>
-        public CoinbaseClient(IAccountsManager accounts, IProductsManager products, IOrdersManager orders, IFeesManager fees)
+        public CoinbaseClient(IAccountsManager accounts, IProductsManager products, IOrdersManager orders, IFeesManager fees, ICommonManager common)
         {
             Accounts = accounts;
             Products = products;
             Orders = orders;
             Fees = fees;
+            Common = common;
         }
     }
 }
