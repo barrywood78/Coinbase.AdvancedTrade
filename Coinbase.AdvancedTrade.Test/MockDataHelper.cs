@@ -1,5 +1,5 @@
 ﻿using Coinbase.AdvancedTrade.Models;
-
+using System.Text.Json;
 
 namespace Coinbase.AdvancedTradeTest.Helpers
 {
@@ -419,6 +419,23 @@ namespace Coinbase.AdvancedTradeTest.Helpers
                 Iso = "2023-11-28T00:00:22Z",
                 EpochSeconds = "1701129622",
                 EpochMillis = "1701129622115"
+            };
+        }
+
+
+
+        public static EditOrderPreviewResult GetMockEditOrderPreviewResponse()
+        {
+            return new EditOrderPreviewResult
+            {
+                Slippage = "0.01", 
+                OrderTotal = "10500", 
+                CommissionTotal = "50", 
+                QuoteSize = "10000", 
+                BaseSize = "0.5", 
+                BestBid = "10400", 
+                BestAsk = "10600",
+                AverageFilledPrice = "10500" 
             };
         }
 

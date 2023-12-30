@@ -95,6 +95,13 @@ namespace Coinbase.AdvancedTradeTest.Helpers
             mock.Setup(o => o.CreateStopLimitOrderGTDAsync(It.IsAny<string>(), It.IsAny<OrderSide>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<DateTime>()))
                 .ReturnsAsync(fixedOrderId);
 
+            mock.Setup(o => o.EditOrderAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(true);
+
+            mock.Setup(o => o.EditOrderPreviewAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(MockDataHelper.GetMockEditOrderPreviewResponse());
+
+
             return mock;
         }
 
