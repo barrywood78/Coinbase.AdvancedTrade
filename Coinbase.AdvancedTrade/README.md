@@ -3,6 +3,9 @@
 
 This project provides a C# wrapper for the [Coinbase Advanced Trade API](https://docs.cloud.coinbase.com/advanced-trade-api), facilitating interactions with various advanced trading functionalities on Coinbase.
 
+**[View the Changelog](#changelog)** - See the detailed log of changes including updates, enhancements, and important notes.
+
+
 ## Overview
 The wrapper is organized into various namespaces, each serving a distinct purpose, covering the spectrum from data models to actual API interactions.
 
@@ -67,3 +70,16 @@ Fine-tuned enumerations like `OrderStatus`, `OrderType`, and others, ensuring cl
 
 ## Additional Information
 - **Models**: Detailed blueprints for entities such as `Account`, `Product`, `Order`, and `Candle`. These lay the groundwork for robust data representation when communicating with the Coinbase API.
+
+# Changelog
+
+## 2023-DEC-31 Update
+
+### Added
+- **Get UNIX Time** (Coinbase: 2023-DEC-06): Implemented feature (GetCoinbaseServerTimeAsync) to retrieve the current UNIX time from the Coinbase Advanced Trading API.
+- **Edit Order and Edit Order Preview** (Coinbase: 2023-NOV-13): Users can now edit and preview edits to orders, limited to certain conditions (IOrdersManager).
+
+### Notes on Non-Implemented Features
+- **Portfolios Feature (Coinbase: 2023-DEC-11)**: Currently in beta by Coinbase and not implemented in this wrapper. Intended for future updates.
+- **Converts Feature (Coinbase: 2023-NOV-27)**: Not implemented due to regional restrictions affecting testing capabilities.
+
