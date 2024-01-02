@@ -73,7 +73,7 @@ Fine-tuned enumerations like `OrderStatus`, `OrderType`, and others, ensuring cl
 
 # Changelog
 
-## 2023-DEC-31 Update
+## 2024-JAN-02 Update
 
 ### Added
 - **Get UNIX Time** (Coinbase: 2023-DEC-06): Implemented feature (GetCoinbaseServerTimeAsync) to retrieve the current UNIX time from the Coinbase Advanced Trading API.
