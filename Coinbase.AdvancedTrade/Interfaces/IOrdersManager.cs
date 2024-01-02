@@ -113,5 +113,31 @@ namespace Coinbase.AdvancedTrade.Interfaces
         /// <param name="endTime">Expiration time for the order.</param>
         /// <returns>A task representing the operation. The task result contains the ID of the created order, or null if creation failed.</returns>
         Task<string?> CreateStopLimitOrderGTDAsync(string productId, OrderSide side, string baseSize, string limitPrice, string stopPrice, DateTime endTime);
+
+
+        /// <summary>
+        /// Asynchronously edits an existing order with a specified new size or new price.
+        /// Only limit orders with a time in force type of good-till-cancelled can be edited.
+        /// Note: Increasing the size or modifying the price will lose the original place in the order book.
+        /// </summary>
+        /// <param name="orderId">ID of the order to edit.</param>
+        /// <param name="price">New price for the order.</param>
+        /// <param name="size">New size for the order.</param>
+        /// <returns>A task representing the operation, returning true if the edit was successful, false otherwise.</returns>
+        Task<bool> EditOrderAsync(string orderId, string price, string size);
+
+        /// <summary>
+        /// Asynchronously simulates an edit of an existing order with a specified new size or new price to preview the result.
+        /// This allows you to see the potential impact of an edit before committing to it.
+        /// Only limit orders with a time in force type of good-till-cancelled can be previewed.
+        /// Note: This does not actually edit the order; it only simulates the edit to provide a preview.
+        /// </summary>
+        /// <param name="orderId">ID of the order to edit.</param>
+        /// <param name="price">New price for the order.</param>
+        /// <param name="size">New size for the order.</param>
+        /// <returns>A task representing the operation, returning true if the preview was successful, false otherwise.</returns>
+        Task<EditOrderPreviewResult> EditOrderPreviewAsync(string orderId, string price, string size);
+
+
     }
 }

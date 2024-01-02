@@ -31,7 +31,8 @@ namespace Coinbase.AdvancedTradeTest
                     MockSetupHelper.InitializeAccountsMock().Object,
                     MockSetupHelper.InitializeProductsMock().Object,
                     MockSetupHelper.InitializeOrdersMock().Object,
-                    MockSetupHelper.InitializeFeesMock().Object);
+                    MockSetupHelper.InitializeFeesMock().Object,
+                    MockSetupHelper.InitializeCommonMock().Object);
 
             _webSocketManager = _coinbaseClient?.WebSocket;
         }

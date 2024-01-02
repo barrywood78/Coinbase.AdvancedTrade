@@ -124,6 +124,10 @@ namespace Coinbase.AdvancedTrade.Models
         // Indicates if the order is a liquidation order.
         [JsonPropertyName("is_liquidation")]
         public bool? IsLiquidation { get; set; }
+
+        // An array of the latest 5 edits per order.
+        [JsonPropertyName("edit_history")]
+        public List<EditHistoryEntry>? EditHistory { get; set; }
     }
 
     // Represents specific configurations for different types of orders.
@@ -213,5 +217,23 @@ namespace Coinbase.AdvancedTrade.Models
         [JsonPropertyName("end_time")]
         public DateTime EndTime { get; set; }
     }
+
+
+    // Represents an edit history entry for an order.
+    public class EditHistoryEntry
+    {
+        // The price associated with the edit.
+        [JsonPropertyName("price")]
+        public string? Price { get; set; }
+
+        // The size associated with the edit.
+        [JsonPropertyName("size")]
+        public string? Size { get; set; }
+
+        // The timestamp when the edit was accepted.
+        [JsonPropertyName("replace_accept_timestamp")]
+        public DateTime? ReplaceAcceptTimestamp { get; set; }
+    }
+
 
 }

@@ -49,6 +49,35 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
         }
 
+
+        /// <summary>
+        /// Deserializes a dictionary into an object of specified type.
+        /// </summary>
+        /// <param name="response">The dictionary representing the JSON object structure.</param>
+        /// <typeparam name="T">The type of object to deserialize into.</typeparam>
+        /// <returns>The deserialized object of type T, or default if deserialization fails.</returns>
+        /// <exception cref="InvalidOperationException">Thrown if deserialization fails due to invalid operation.</exception>
+        /// <remarks>
+        /// This method converts the provided dictionary into a JSON string and then attempts to deserialize it into the specified type.
+        /// It's useful for reconstructing objects when the response is already parsed into a dictionary form.
+        /// If the dictionary does not represent a JSON structure compatible with type T, deserialization will fail.
+        /// </remarks>
+        protected static T? DeserializeDictionary<T>(Dictionary<string, object> response)
+        {
+            try
+            {
+                // Convert the response dictionary back to JSON string and then deserialize it.
+                string jsonString = JsonSerializer.Serialize(response);
+                return JsonSerializer.Deserialize<T>(jsonString);
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException("Failed to deserialize dictionary", ex);
+            }
+        }
+
+
+
         /// <summary>
         /// Extracts a double value from a dictionary based on a specified key.
         /// </summary>

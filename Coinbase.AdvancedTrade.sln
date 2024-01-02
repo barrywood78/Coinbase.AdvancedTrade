@@ -7,21 +7,26 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coinbase.AdvancedTrade", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coinbase.AdvancedTrade.Tests", "Coinbase.AdvancedTrade.Test\Coinbase.AdvancedTrade.Tests.csproj", "{20D5F9A9-9F4D-4EF7-BB99-ECBE3E3C7A97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketCandlesTestApp", "WebSocketTestApp\WebSocketCandlesTestApp.csproj", "{D5F16F96-48CE-458E-A1C6-8BE49A4C5B05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketCandlesTestApp", "WebSocketTestApp\WebSocketCandlesTestApp.csproj", "{D5F16F96-48CE-458E-A1C6-8BE49A4C5B05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketHeartbeatTestApp", "WebSocketHeartbeatTestApp\WebSocketHeartbeatTestApp.csproj", "{EE7B5B64-BBCD-4146-8D0F-376617721789}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketHeartbeatTestApp", "WebSocketHeartbeatTestApp\WebSocketHeartbeatTestApp.csproj", "{EE7B5B64-BBCD-4146-8D0F-376617721789}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketMarketTradesTestApp", "WebSocketMarketTradesTestApp\WebSocketMarketTradesTestApp.csproj", "{CE222C8F-B1A2-4F0A-A36F-5A5C454C38D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketMarketTradesTestApp", "WebSocketMarketTradesTestApp\WebSocketMarketTradesTestApp.csproj", "{CE222C8F-B1A2-4F0A-A36F-5A5C454C38D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketStatusTestApp", "WebSocketStatusTestApp\WebSocketStatusTestApp.csproj", "{44C1BDEE-612B-4872-B7F9-3A1499FEA731}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketStatusTestApp", "WebSocketStatusTestApp\WebSocketStatusTestApp.csproj", "{44C1BDEE-612B-4872-B7F9-3A1499FEA731}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketTickerTestApp", "WebSocketTickerTestApp\WebSocketTickerTestApp.csproj", "{4EED7C8C-1F0A-4887-84A8-A70FF61B89C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketTickerTestApp", "WebSocketTickerTestApp\WebSocketTickerTestApp.csproj", "{4EED7C8C-1F0A-4887-84A8-A70FF61B89C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketTickerBatchTestApp", "WebSocketTickerBatchTestApp\WebSocketTickerBatchTestApp.csproj", "{372C7CD7-ABEF-4587-B3D1-95D55E55138F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketTickerBatchTestApp", "WebSocketTickerBatchTestApp\WebSocketTickerBatchTestApp.csproj", "{372C7CD7-ABEF-4587-B3D1-95D55E55138F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketLevel2TestApp", "WebSocketLevel2TestApp\WebSocketLevel2TestApp.csproj", "{2C902B47-52DB-4EFF-8BD5-BECEC2656CFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketLevel2TestApp", "WebSocketLevel2TestApp\WebSocketLevel2TestApp.csproj", "{2C902B47-52DB-4EFF-8BD5-BECEC2656CFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSocketUserTestApp", "WebSocketUserTestApp\WebSocketUserTestApp.csproj", "{3648ED4D-CD32-44ED-B5B3-482A8AE54287}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketUserTestApp", "WebSocketUserTestApp\WebSocketUserTestApp.csproj", "{3648ED4D-CD32-44ED-B5B3-482A8AE54287}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B03447D-8DFB-44A0-8D96-C2F56DFC9167}"
+	ProjectSection(SolutionItems) = preProject
+		ToDo.txt = ToDo.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

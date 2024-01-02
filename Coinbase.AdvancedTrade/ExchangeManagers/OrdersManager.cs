@@ -492,5 +492,145 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
 
+        /// <inheritdoc/>
+        public async Task<bool> EditOrderAsync(string orderId, string? price = null, string? size = null)
+        {
+            if (string.IsNullOrEmpty(orderId))
+            {
+                throw new ArgumentException("Order ID cannot be null or empty.", nameof(orderId));
+            }
+
+            if (string.IsNullOrEmpty(price))
+            {
+                throw new ArgumentException("Price cannot be null or empty.", nameof(price));
+            }
+
+            if (string.IsNullOrEmpty(size))
+            {
+                throw new ArgumentException("Size cannot be null or empty.", nameof(size));
+            }
+
+            var requestBody = new
+            {
+                order_id = orderId,
+                price,
+                size
+            };
+
+            try
+            {
+                var response = await _authenticator.SendAuthenticatedRequestAsync("POST", "/api/v3/brokerage/orders/edit", null, requestBody) ?? new Dictionary<string, object>();
+                var responseObject = DeserializeDictionary<Dictionary<string, JsonElement>>(response);
+
+                if (responseObject != null && responseObject.TryGetValue("success", out var successValue) && successValue.GetBoolean())
+                {
+                    return true; // Operation was successful
+                }
+
+                // Start constructing the error message
+                var errorMessage = "Failed to edit order.";
+
+                if (responseObject?.TryGetValue("errors", out var errorsValue) == true && errorsValue.ValueKind == JsonValueKind.Array)
+                {
+                    var errorsArray = errorsValue.EnumerateArray().FirstOrDefault(); // Assuming the first element has the error details
+                    if (errorsArray.TryGetProperty("edit_failure_reason", out var failureReason))
+                    {
+                        errorMessage += $" Reason: {failureReason.GetString()}";
+                    }
+                }
+
+                throw new InvalidOperationException(errorMessage);
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the exception as needed
+                throw new InvalidOperationException("Failed to edit order due to an exception.", ex);
+            }
+        }
+
+
+        /// <inheritdoc/>
+        public async Task<EditOrderPreviewResult> EditOrderPreviewAsync(string orderId, string price, string size)
+        {
+            // Validation of input parameters
+            if (string.IsNullOrEmpty(orderId))
+            {
+                throw new ArgumentException("Order ID cannot be null or empty.", nameof(orderId));
+            }
+
+            if (string.IsNullOrEmpty(price))
+            {
+                throw new ArgumentException("Price cannot be null or empty.", nameof(price));
+            }
+
+            if (string.IsNullOrEmpty(size))
+            {
+                throw new ArgumentException("Size cannot be null or empty.", nameof(size));
+            }
+
+            var requestBody = new
+            {
+                order_id = orderId,
+                price,
+                size
+            };
+
+            try
+            {
+                var response = await _authenticator.SendAuthenticatedRequestAsync("POST", "/api/v3/brokerage/orders/edit_preview", null, requestBody) ?? new Dictionary<string, object>();
+                var responseObject = DeserializeDictionary<Dictionary<string, JsonElement>>(response);
+
+                // Check if there are errors
+                if (responseObject != null && responseObject.TryGetValue("errors", out var errorsValue) && errorsValue.ValueKind == JsonValueKind.Array)
+                {
+                    // Get all error objects from the errors array
+                    var errorsArray = errorsValue.EnumerateArray().ToList();  // Convert to list for easier handling
+
+                    if (errorsArray.Any()) // Check if there are any error objects
+                    {
+                        var errorMessage = "Failed to preview order edit.";
+
+                        // Append all error messages if any
+                        foreach (var errorObj in errorsArray)
+                        {
+                            if (errorObj.TryGetProperty("edit_failure_reason", out var editFailureReason))
+                            {
+                                errorMessage += $" Edit Failure Reason: {editFailureReason.GetString()}.";
+                            }
+
+                            if (errorObj.TryGetProperty("preview_failure_reason", out var previewFailureReason))
+                            {
+                                errorMessage += $" Preview Failure Reason: {previewFailureReason.GetString()}.";
+                            }
+                        }
+
+                        throw new InvalidOperationException(errorMessage);
+                    }
+                }
+
+                // Assuming no errors or empty error array, populate the EditOrderPreviewResult from responseObject
+                var result = new EditOrderPreviewResult
+                {
+                    Slippage = responseObject?.GetValueOrDefault("slippage").GetString() ?? string.Empty,
+                    OrderTotal = responseObject?.GetValueOrDefault("order_total").GetString() ?? string.Empty,
+                    CommissionTotal = responseObject?.GetValueOrDefault("commission_total").GetString() ?? string.Empty,
+                    QuoteSize = responseObject?.GetValueOrDefault("quote_size").GetString() ?? string.Empty,
+                    BaseSize = responseObject?.GetValueOrDefault("base_size").GetString() ?? string.Empty,
+                    BestBid = responseObject?.GetValueOrDefault("best_bid").GetString() ?? string.Empty,
+                    BestAsk = responseObject?.GetValueOrDefault("best_ask").GetString() ?? string.Empty,
+                    AverageFilledPrice = responseObject?.GetValueOrDefault("average_filled_price").GetString() ?? string.Empty
+                };
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the exception as needed
+                throw new InvalidOperationException("Failed to preview order edit due to an exception.", ex);
+            }
+        }
+
+
+
     }
 }

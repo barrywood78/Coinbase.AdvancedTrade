@@ -83,5 +83,49 @@ namespace Coinbase.AdvancedTradeTest
         }
 
 
+
+        [TestMethod]
+        [Description("Test to verify that EditOrder successfully edits an existing order.")]
+        public async Task Test_Orders_EditOrderAsync()
+        {
+            await ExecuteRateLimitedTest(async () =>
+            {
+                string existingOrderId = "0b3273de-e901-4e4d-bbf6-ecb107578a3c";
+
+                string newPrice = "40500";
+                string? newSize = "0.0000393";
+
+                // Attempt to edit the order
+                var result = await _coinbaseClient!.Orders.EditOrderAsync(existingOrderId, newPrice, newSize);
+
+                // Assert that the edit operation was reported as successful
+                Assert.IsTrue(result, "Edit operation should be reported as successful.");
+            });
+        }
+
+
+        [TestMethod]
+        [Description("Test to verify that EditOrderPreview successfully previewed the edit of an existing order.")]
+        public async Task Test_Orders_EditOrderPreviewAsync()
+        {
+            await ExecuteRateLimitedTest(async () =>
+            {
+                string existingOrderId = "0b3273de-e901-4e4d-bbf6-ecb107578a3c";
+
+                string newPrice = "40500";
+                string newSize = "0.0000393"; 
+
+                var result = await _coinbaseClient!.Orders.EditOrderPreviewAsync(existingOrderId, newPrice, newSize);
+
+                Assert.IsNotNull(result, "Preview result should not be null.");
+                Assert.IsFalse(string.IsNullOrWhiteSpace(result.OrderTotal), "OrderTotal should have a value.");
+                Assert.IsFalse(string.IsNullOrWhiteSpace(result.CommissionTotal), "CommissionTotal should have a value.");
+      
+            });
+        }
+
+
+
+
     }
 }
