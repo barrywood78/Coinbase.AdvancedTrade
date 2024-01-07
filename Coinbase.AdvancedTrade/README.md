@@ -73,6 +73,11 @@ Fine-tuned enumerations like `OrderStatus`, `OrderType`, and others, ensuring cl
 
 # Changelog
 
+## 2024-JAN-07 Update
+- **Fixed Stop Loss Order Creation Issue**: CoinbaseClient.Orders.CreateStopLimitOrderGTCAsync( ) and CoinbaseClient.Orders.CreateStopLimitOrderGTDAsync( ) were not creating Stop Loss orders correctly. This has been fixed.
+- **Order Creation Exception Handling**:   Better exception handling for Order Creation. An exception is thrown with Coinbase response details instead of just returning null.
+
+
 ## 2024-JAN-02 Update
 
 ### Added
