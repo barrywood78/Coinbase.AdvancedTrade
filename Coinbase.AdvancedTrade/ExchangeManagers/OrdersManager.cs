@@ -242,24 +242,35 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                 // If there's an 'error_response', handle it
                 else if (response.ContainsKey("error_response"))
                 {
-                    // Extract the error message from the response and deserialize
-                    var errorResponseValue = response["error_response"] as string;
+                    // Extract the error message from the response
+                    var errorResponseObj = response["error_response"];
 
-                    if (string.IsNullOrEmpty(errorResponseValue))
+                    // Assuming errorResponseObj is a JsonElement
+                    if (errorResponseObj is JsonElement errorResponseElement)
                     {
-                        // If error response is null or empty, return null (or handle as needed)
-                        return null;
+                        var errorResponseValue = errorResponseElement.GetRawText(); // Get the raw JSON text
+
+                        if (!string.IsNullOrEmpty(errorResponseValue))
+                        {
+                            // Deserialize the error response from the raw text
+                            var errorResponse = JsonSerializer.Deserialize<Dictionary<string, string>>(errorResponseValue);
+
+                            if (errorResponse != null)
+                            {
+                                // Construct an error message using the provided details
+                                var error = errorResponse.ContainsKey("error") ? errorResponse["error"] : "Unknown Error";
+                                var message = errorResponse.ContainsKey("message") ? errorResponse["message"] : "No Message";
+                                var errorDetails = errorResponse.ContainsKey("error_details") ? errorResponse["error_details"] : "No Details";
+
+                                throw new Exception($"Order creation failed. Error: {error}. Message: {message}. Details: {errorDetails}");
+                            }
+                        }
                     }
 
-                    var errorResponse = JsonSerializer.Deserialize<Dictionary<string, string>>(errorResponseValue);
-
-                    // Construct an error message using the provided details
-                    var error = errorResponse?["error"] ?? "Unknown Error";
-                    var message = errorResponse?["message"] ?? "No Message";
-                    var errorDetails = errorResponse?["error_details"] ?? "No Details";
-
-                    throw new Exception($"Order creation failed. Error: {error}. Message: {message}. Details: {errorDetails}");
+                    // If error response is not in the expected format or is empty, return null (or handle as needed)
+                    return null;
                 }
+
 
                 // If we reach here, the order creation was not successful
                 return null;
@@ -413,8 +424,8 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             // Determine stop direction based on the side of the order (BUY or SELL)
             string stopDirection = side switch
             {
-                OrderSide.BUY => "STOP_DIRECTION_STOP_DOWN",
-                OrderSide.SELL => "STOP_DIRECTION_STOP_UP",
+                OrderSide.BUY => "STOP_DIRECTION_STOP_UP",
+                OrderSide.SELL => "STOP_DIRECTION_STOP_DOWN",
                 _ => throw new ArgumentException($"Invalid order side provided: {side}.")
             };
 
@@ -468,8 +479,8 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             // Determine stop direction based on the side of the order (BUY or SELL)
             string stopDirection = side switch
             {
-                OrderSide.BUY => "STOP_DIRECTION_STOP_DOWN",
-                OrderSide.SELL => "STOP_DIRECTION_STOP_UP",
+                OrderSide.BUY => "STOP_DIRECTION_STOP_UP",
+                OrderSide.SELL => "STOP_DIRECTION_STOP_DOWN",
                 _ => throw new ArgumentException($"Invalid order side provided: {side}.")
             };
 
