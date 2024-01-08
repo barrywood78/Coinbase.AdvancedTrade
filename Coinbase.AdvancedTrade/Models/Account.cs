@@ -1,5 +1,5 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Coinbase.AdvancedTrade.Models
 {
@@ -11,74 +11,74 @@ namespace Coinbase.AdvancedTrade.Models
         /// <summary>
         /// Gets or sets the unique identifier for the account.
         /// </summary>
-        [JsonPropertyName("uuid")]
-        public string? Uuid { get; set; }
+        [JsonProperty("uuid")]
+        public string Uuid { get; set; }
 
         /// <summary>
         /// Gets or sets the name associated with the account.
         /// </summary>
-        [JsonPropertyName("name")]
-        public string? Name { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the currency code for the account.
         /// </summary>
-        [JsonPropertyName("currency")]
-        public string? Currency { get; set; }
+        [JsonProperty("currency")]
+        public string Currency { get; set; }
 
         /// <summary>
         /// Gets or sets the available balance within the account.
         /// </summary>
-        [JsonPropertyName("available_balance")]
-        public Balance? AvailableBalance { get; set; }
+        [JsonProperty("available_balance")]
+        public Balance AvailableBalance { get; set; }
 
         /// <summary>
         /// Indicates if this account is the default one for the user.
         /// </summary>
-        [JsonPropertyName("default")]
+        [JsonProperty("default")]
         public bool Default { get; set; }
 
         /// <summary>
         /// Indicates if this account is active.
         /// </summary>
-        [JsonPropertyName("active")]
+        [JsonProperty("active")]
         public bool Active { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time when the account was created.
         /// </summary>
-        [JsonPropertyName("created_at")]
+        [JsonProperty("created_at")]
         public DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time when the account was last updated.
         /// </summary>
-        [JsonPropertyName("updated_at")]
+        [JsonProperty("updated_at")]
         public DateTime UpdatedAt { get; set; }
 
         /// <summary>
         /// Gets or sets the date and time when the account was deleted, if applicable.
         /// </summary>
-        [JsonPropertyName("deleted_at")]
+        [JsonProperty("deleted_at")]
         public DateTime? DeletedAt { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the account.
         /// </summary>
-        [JsonPropertyName("type")]
-        public string? Type { get; set; }
+        [JsonProperty("type")]
+        public string Type { get; set; }
 
         /// <summary>
         /// Indicates if this account is ready for transactions.
         /// </summary>
-        [JsonPropertyName("ready")]
+        [JsonProperty("ready")]
         public bool Ready { get; set; }
 
         /// <summary>
         /// Gets or sets the funds on hold within the account.
         /// </summary>
-        [JsonPropertyName("hold")]
-        public Balance? Hold { get; set; }
+        [JsonProperty("hold")]
+        public Balance Hold { get; set; }
     }
 
     /// <summary>
@@ -89,13 +89,13 @@ namespace Coinbase.AdvancedTrade.Models
         /// <summary>
         /// Gets or sets the value of the balance.
         /// </summary>
-        [JsonPropertyName("value")]
-        public string? Value { get; set; }  // Consider converting to Decimal if working with financial data
+        [JsonProperty("value")]
+        public string Value { get; set; }  // Consider converting to Decimal if working with financial data
 
         /// <summary>
         /// Gets or sets the currency code associated with the balance.
         /// </summary>
-        [JsonPropertyName("currency")]
-        public string? Currency { get; set; }
+        [JsonProperty("currency")]
+        public string Currency { get; set; }
     }
 }

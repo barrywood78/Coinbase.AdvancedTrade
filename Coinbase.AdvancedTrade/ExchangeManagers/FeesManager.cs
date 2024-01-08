@@ -18,7 +18,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         public FeesManager(CoinbaseAuthenticator authenticator) : base(authenticator) { }
 
         /// <inheritdoc/>
-        public async Task<TransactionsSummary?> GetTransactionsSummaryAsync(
+        public async Task<TransactionsSummary> GetTransactionsSummaryAsync(
             DateTime startDate,
             DateTime endDate,
             string userNativeCurrency = "USD",
@@ -44,7 +44,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                 var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/transaction_summary", paramsDict);
 
 
-                if (response is not null)
+                if (response != null)
                 {
                     return new TransactionsSummary
                     {

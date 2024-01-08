@@ -25,7 +25,7 @@ namespace Coinbase.AdvancedTradeTest
             await ExecuteRateLimitedTest(async () =>
             {
                 Assert.IsNotNull(_coinbaseClient, "Coinbase client should not be null.");
-                var orderNumber = await _coinbaseClient!.Orders.CreateMarketOrderAsync("BTC-USDC", OrderSide.SELL, "0.000035");
+                var orderNumber = await _coinbaseClient!.Orders.CreateMarketOrderAsync("BTC-USDC", OrderSide.SELL, "0.00002111");
                 Assert.IsNotNull(orderNumber, "Order Number should not be null.");
             });
         }

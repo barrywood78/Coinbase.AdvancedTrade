@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace Coinbase.AdvancedTrade.Models
 {
@@ -11,25 +12,25 @@ namespace Coinbase.AdvancedTrade.Models
         /// <summary>
         /// Gets or sets the product identifier associated with the order book.
         /// </summary>
-        [JsonPropertyName("product_id")]
-        public string? ProductId { get; set; }
+        [JsonProperty("product_id")]
+        public string ProductId { get; set; }
 
         /// <summary>
         /// Gets or sets the list of buy orders for the product.
         /// </summary>
-        [JsonPropertyName("bids")]
-        public List<Offer>? Bids { get; set; }
+        [JsonProperty("bids")]
+        public List<Offer> Bids { get; set; }
 
         /// <summary>
         /// Gets or sets the list of sell orders for the product.
         /// </summary>
-        [JsonPropertyName("asks")]
-        public List<Offer>? Asks { get; set; }
+        [JsonProperty("asks")]
+        public List<Offer> Asks { get; set; }
 
         /// <summary>
         /// Gets or sets the timestamp when the order book was captured.
         /// </summary>
-        [JsonPropertyName("time")]
+        [JsonProperty("time")]
         public DateTime Time { get; set; }
     }
 
@@ -41,13 +42,13 @@ namespace Coinbase.AdvancedTrade.Models
         /// <summary>
         /// Gets or sets the price at which the offer is made.
         /// </summary>
-        [JsonPropertyName("price")]
-        public string? Price { get; set; }
+        [JsonProperty("price")]
+        public string Price { get; set; }
 
         /// <summary>
         /// Gets or sets the size or quantity of the offer.
         /// </summary>
-        [JsonPropertyName("size")]
-        public string? Size { get; set; }
+        [JsonProperty("size")]
+        public string Size { get; set; }
     }
 }
