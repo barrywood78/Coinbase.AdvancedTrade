@@ -18,7 +18,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         public CommonManager(CoinbaseAuthenticator authenticator) : base(authenticator) { }
 
         /// <inheritdoc/>
-        public async Task<ServerTime?> GetCoinbaseServerTimeAsync()
+        public async Task<ServerTime> GetCoinbaseServerTimeAsync()
         {
             try
             {

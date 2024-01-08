@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Coinbase.AdvancedTrade.Models.WebSocket
 {
@@ -12,32 +12,32 @@ namespace Coinbase.AdvancedTrade.Models.WebSocket
         /// <summary>
         /// Gets or sets the channel for the heartbeat message.
         /// </summary>
-        [JsonPropertyName("channel")]
-        public string? Channel { get; set; }
+        [JsonProperty("channel")]
+        public string Channel { get; set; }
 
         /// <summary>
         /// Gets or sets the client ID associated with the heartbeat message.
         /// </summary>
-        [JsonPropertyName("client_id")]
-        public string? ClientId { get; set; }
+        [JsonProperty("client_id")]
+        public string ClientId { get; set; }
 
         /// <summary>
         /// Gets or sets the timestamp when the heartbeat message was sent.
         /// </summary>
-        [JsonPropertyName("timestamp")]
+        [JsonProperty("timestamp")]
         public DateTime Timestamp { get; set; }
 
         /// <summary>
         /// Gets or sets the sequence number for the heartbeat message.
         /// </summary>
-        [JsonPropertyName("sequence_num")]
+        [JsonProperty("sequence_num")]
         public int SequenceNum { get; set; }
 
         /// <summary>
         /// Gets or sets the list of heartbeat events.
         /// </summary>
-        [JsonPropertyName("events")]
-        public List<HeartbeatEvent>? Events { get; set; }
+        [JsonProperty("events")]
+        public List<HeartbeatEvent> Events { get; set; }
     }
 
     /// <summary>
@@ -48,13 +48,13 @@ namespace Coinbase.AdvancedTrade.Models.WebSocket
         /// <summary>
         /// Gets or sets the current time for the heartbeat event.
         /// </summary>
-        [JsonPropertyName("current_time")]
-        public string? CurrentTime { get; set; }
+        [JsonProperty("current_time")]
+        public string CurrentTime { get; set; }
 
         /// <summary>
         /// Gets or sets the counter for the heartbeat event.
         /// </summary>
-        [JsonPropertyName("heartbeat_counter")]
+        [JsonProperty("heartbeat_counter")]
         public int? HeartbeatCounter { get; set; }
     }
 }

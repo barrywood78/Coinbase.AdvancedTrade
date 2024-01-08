@@ -1,11 +1,13 @@
 ﻿using Coinbase.AdvancedTrade.Enums;
 using Coinbase.AdvancedTrade.Interfaces;
 using Coinbase.AdvancedTrade.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System;
+using System.Linq;
+
 
 namespace Coinbase.AdvancedTrade.ExchangeManagers
 {
@@ -21,7 +23,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         public ProductsManager(CoinbaseAuthenticator authenticator) : base(authenticator) { }
 
         /// <inheritdoc/>
-        public async Task<List<Product>?> ListProductsAsync(string productType = "SPOT")
+        public async Task<List<Product>> ListProductsAsync(string productType = "SPOT")
         {
             if (string.IsNullOrEmpty(productType))
             {
@@ -39,25 +41,26 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         }
 
         /// <inheritdoc/>
-        public async Task<Product?> GetProductAsync(string productId)
+        public async Task<Product> GetProductAsync(string productId)
         {
             if (string.IsNullOrEmpty(productId))
             {
                 throw new ArgumentException("Product ID cannot be null or empty", nameof(productId));
             }
 
-            Dictionary<string, object>? response = await _authenticator.SendAuthenticatedRequestAsync("GET", $"/api/v3/brokerage/products/{productId}");
+            Dictionary<string, object> response = await _authenticator.SendAuthenticatedRequestAsync("GET", $"/api/v3/brokerage/products/{productId}");
             if (response != null)
             {
-                string rawText = JsonSerializer.SerializeToElement(response).GetRawText();
-                return JsonSerializer.Deserialize<Product>(rawText);
+                // Convert the response dictionary back to JSON string and then deserialize it
+                string rawText = JsonConvert.SerializeObject(response);
+                return JsonConvert.DeserializeObject<Product>(rawText);
             }
 
             return null;
         }
 
         /// <inheritdoc/>
-        public async Task<List<Candle>?> GetProductCandlesAsync(string productId, string start, string end, Granularity granularity)
+        public async Task<List<Candle>> GetProductCandlesAsync(string productId, string start, string end, Granularity granularity)
         {
             if (string.IsNullOrEmpty(productId) || string.IsNullOrEmpty(start) || string.IsNullOrEmpty(end))
             {
@@ -70,7 +73,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         }
 
         /// <inheritdoc/>
-        public async Task<MarketTrades?> GetMarketTradesAsync(string productId, int limit)
+        public async Task<MarketTrades> GetMarketTradesAsync(string productId, int limit)
         {
             if (string.IsNullOrEmpty(productId) || limit <= 0)
             {
@@ -81,21 +84,22 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             var response = await _authenticator.SendAuthenticatedRequestAsync("GET", $"/api/v3/brokerage/products/{productId}/ticker", ConvertToDictionary(parameters)) ?? throw new InvalidOperationException("Response is null");
 
             // Extract trades data from response
-            if (!response.TryGetValue("trades", out object? tradesObj) || tradesObj is not JsonElement tradesElement || tradesElement.ValueKind != JsonValueKind.Array)
+            if (!response.TryGetValue("trades", out object tradesObj) || !(tradesObj is JArray tradesArray))
             {
                 throw new InvalidOperationException("Invalid 'trades' data in the response");
             }
-            List<Trade>? trades = JsonSerializer.Deserialize<List<Trade>>(tradesElement.GetRawText());
+
+            List<Trade> trades = JsonConvert.DeserializeObject<List<Trade>>(tradesArray.ToString());
 
             // Extract best bid and best ask
-            string? bestBid = response.TryGetValue("best_bid", out object? bestBidObj) ? bestBidObj?.ToString() : null;
-            string? bestAsk = response.TryGetValue("best_ask", out object? bestAskObj) ? bestAskObj?.ToString() : null;
+            string bestBid = response.TryGetValue("best_bid", out object bestBidObj) ? bestBidObj?.ToString() : null;
+            string bestAsk = response.TryGetValue("best_ask", out object bestAskObj) ? bestAskObj?.ToString() : null;
 
             return new MarketTrades { Trades = trades, BestBid = bestBid, BestAsk = bestAsk };
         }
 
         /// <inheritdoc/>
-        public async Task<ProductBook?> GetProductBookAsync(string productId, int limit)
+        public async Task<ProductBook> GetProductBookAsync(string productId, int limit)
         {
             if (string.IsNullOrEmpty(productId))
             {
@@ -108,7 +112,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         }
 
         /// <inheritdoc/>
-        public async Task<List<ProductBook>?> GetBestBidAskAsync(List<string> productIds)
+        public async Task<List<ProductBook>> GetBestBidAskAsync(List<string> productIds)
         {
             if (productIds == null || !productIds.Any())
             {
@@ -119,9 +123,9 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             string url = "/api/v3/brokerage/best_bid_ask?" + string.Join("&", productIds.Select(pid => $"product_ids={pid}"));
             var response = await _authenticator.SendAuthenticatedRequestAsync("GET", url);
 
-            if (response != null && response.TryGetValue("pricebooks", out object? pricebooksObj) && pricebooksObj is JsonElement pricebooksElement)
+            if (response != null && response.TryGetValue("pricebooks", out object pricebooksObj) && pricebooksObj is JArray pricebooksArray)
             {
-                return JsonSerializer.Deserialize<List<ProductBook>>(pricebooksElement.GetRawText());
+                return JsonConvert.DeserializeObject<List<ProductBook>>(pricebooksArray.ToString());
             }
 
             return null;

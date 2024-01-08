@@ -1,9 +1,8 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace Coinbase.AdvancedTrade.ExchangeManagers
 {
@@ -26,28 +25,32 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         }
 
         /// <summary>
-        /// Deserializes a JsonElement from a given dictionary based on a specified key.
+        /// Deserializes an object from a given dictionary based on a specified key.
         /// </summary>
         /// <param name="response">The dictionary containing the response.</param>
-        /// <param name="key">The key to retrieve the JsonElement.</param>
+        /// <param name="key">The key to retrieve the object.</param>
         /// <typeparam name="T">The type to deserialize to.</typeparam>
         /// <returns>The deserialized object of type T.</returns>
         /// <exception cref="InvalidOperationException">Thrown if deserialization fails.</exception>
-        protected static T? DeserializeJsonElement<T>(Dictionary<string, object> response, string key)
+        protected static T DeserializeJsonElement<T>(Dictionary<string, object> response, string key)
         {
             try
             {
-                if (response.TryGetValue(key, out object? valueObj) && valueObj is JsonElement element)
+                if (response.TryGetValue(key, out object valueObj) && valueObj != null)
                 {
-                    return JsonSerializer.Deserialize<T>(element.GetRawText());
+                    // Assuming the object is already a string representation of JSON
+                    // Alternatively, you might need to convert it to a string depending on what the object actually is
+                    string json = valueObj.ToString();
+                    return JsonConvert.DeserializeObject<T>(json);
                 }
-                return default;
+                return default(T);
             }
             catch (JsonException ex)
             {
                 throw new InvalidOperationException("Failed to deserialize JSON element", ex);
             }
         }
+
 
 
         /// <summary>
@@ -62,19 +65,20 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         /// It's useful for reconstructing objects when the response is already parsed into a dictionary form.
         /// If the dictionary does not represent a JSON structure compatible with type T, deserialization will fail.
         /// </remarks>
-        protected static T? DeserializeDictionary<T>(Dictionary<string, object> response)
+        protected static T DeserializeDictionary<T>(Dictionary<string, object> response)
         {
             try
             {
                 // Convert the response dictionary back to JSON string and then deserialize it.
-                string jsonString = JsonSerializer.Serialize(response);
-                return JsonSerializer.Deserialize<T>(jsonString);
+                string jsonString = JsonConvert.SerializeObject(response);
+                return JsonConvert.DeserializeObject<T>(jsonString);
             }
             catch (JsonException ex)
             {
                 throw new InvalidOperationException("Failed to deserialize dictionary", ex);
             }
         }
+
 
 
 
@@ -89,9 +93,19 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         {
             try
             {
-                if (response.TryGetValue(key, out object? valueObj) && valueObj is JsonElement element && element.ValueKind == JsonValueKind.Number)
+                if (response.TryGetValue(key, out object valueObj))
                 {
-                    return element.GetDouble();
+                    if (valueObj is double doubleValue)
+                    {
+                        // Directly cast if it's already a double
+                        return doubleValue;
+                    }
+                    else if (valueObj is string stringValue && double.TryParse(stringValue, out doubleValue))
+                    {
+                        // Try to parse if it's a string representation of a number
+                        return doubleValue;
+                    }
+                    // Add additional conversion logic here if necessary
                 }
                 return null;
             }
@@ -101,6 +115,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
         }
 
+
         /// <summary>
         /// Converts an object's properties to a dictionary of string keys and values.
         /// </summary>
@@ -109,17 +124,28 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         protected static Dictionary<string, string> ConvertToDictionary(object obj)
         {
             return obj.GetType().GetProperties()
-                .Where(prop => prop.GetValue(obj) is { } value)
+                .Where(prop => prop.GetValue(obj) != null) // Simplified null check
                 .ToDictionary(
                     prop => prop.Name,
-                    prop => prop.GetValue(obj) switch
+                    prop =>
                     {
-                        Array array => string.Join(',', array.Cast<object>()),
-                        IList nonGenericList => string.Join(',', nonGenericList.Cast<object>()),
-                        var other => other?.ToString() ?? string.Empty
+                        var value = prop.GetValue(obj);
+                        if (value is Array array) // Handle arrays
+                        {
+                            return string.Join(",", array.Cast<object>());
+                        }
+                        else if (value is IList && !(value is string)) // Handle non-generic lists
+                        {
+                            return string.Join(",", ((IList)value).Cast<object>());
+                        }
+                        else // Handle other types
+                        {
+                            return value?.ToString() ?? string.Empty;
+                        }
                     }
                 );
         }
+
 
         /// <summary>
         /// Converts an array of enums to an array of strings.
@@ -127,18 +153,23 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         /// <param name="enums">The array of enums.</param>
         /// <typeparam name="TEnum">The type of enum.</typeparam>
         /// <returns>An array of strings.</returns>
-        protected static string[]? EnumToStringArray<TEnum>(TEnum[]? enums) where TEnum : struct
+        protected static string[] EnumToStringArray<TEnum>(TEnum[] enums) where TEnum : struct
         {
-            return enums?.Select(e => e.ToString()!).ToArray();
+            if (enums == null)
+                return null;
+
+            return enums.Select(e => e.ToString()).ToArray();
         }
+
 
         /// <summary>
         /// Formats a DateTime instance to the ISO 8601 format.
         /// </summary>
         /// <param name="dateTime">The DateTime instance to format.</param>
         /// <returns>The ISO 8601 formatted string.</returns>
-        protected static string? FormatDateToISO8601(DateTime? dateTime)
+        protected static string FormatDateToISO8601(DateTime? dateTime)
         {
+            // The 'o' or round-trip format specifier represents the time in ISO 8601 format
             return dateTime?.ToUniversalTime().ToString("o");
         }
     }

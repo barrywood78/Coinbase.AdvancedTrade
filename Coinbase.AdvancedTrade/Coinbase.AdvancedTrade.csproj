@@ -1,26 +1,26 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <TargetFrameworks>netstandard2.0;net8.0;net48</TargetFrameworks>
+     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Title>Coinbase.AdvancedTrade</Title>
     <PackageProjectUrl>https://github.com/barrywood78/Coinbase.AdvancedTrade</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<AssemblyVersion>1.0.3</AssemblyVersion>
-	<FileVersion>1.0.3</FileVersion>
-	<Version>1.0.4</Version>
+	<AssemblyVersion>1.1</AssemblyVersion>
+	<FileVersion>1.1</FileVersion>
+	<Version>1.1</Version>
+	<Description>An unofficial Coinbase API Wrapper</Description>
 
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="README.md">
+    <None Include="README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>

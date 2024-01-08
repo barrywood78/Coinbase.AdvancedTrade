@@ -73,6 +73,9 @@ Fine-tuned enumerations like `OrderStatus`, `OrderType`, and others, ensuring cl
 
 # Changelog
 
+## 2024-JAN-08
+- **Changed Target Frameworks**: Changed project's target frameworks to .NET Standard 2.0, .NET 8, and .NET Framework 4.8
+
 ## 2024-JAN-07 Update
 - **Fixed Stop Loss Order Creation Issue**: CoinbaseClient.Orders.CreateStopLimitOrderGTCAsync( ) and CoinbaseClient.Orders.CreateStopLimitOrderGTDAsync( ) were not creating Stop Loss orders correctly. This has been fixed.
 - **Order Creation Exception Handling**:   Better exception handling for Order Creation. An exception is thrown with Coinbase response details instead of just returning null.
@@ -87,4 +90,3 @@ Fine-tuned enumerations like `OrderStatus`, `OrderType`, and others, ensuring cl
 ### Notes on Non-Implemented Features
 - **Portfolios Feature (Coinbase: 2023-DEC-11)**: Currently in beta by Coinbase and not implemented in this wrapper. Intended for future updates.
 - **Converts Feature (Coinbase: 2023-NOV-27)**: Not implemented due to regional restrictions affecting testing capabilities.
-

@@ -18,7 +18,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         public AccountsManager(CoinbaseAuthenticator authenticator) : base(authenticator) { }
 
         /// <inheritdoc/>
-        public async Task<List<Account>?> ListAccountsAsync(int limit = 49, string? cursor = null)
+        public async Task<List<Account>> ListAccountsAsync(int limit = 49, string cursor = null)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         }
 
         /// <inheritdoc/>
-        public async Task<Account?> GetAccountAsync(string accountUuid)
+        public async Task<Account> GetAccountAsync(string accountUuid)
         {
             // Check if the provided UUID is valid.
             if (string.IsNullOrEmpty(accountUuid))

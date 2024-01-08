@@ -1,7 +1,8 @@
 ﻿using Coinbase.AdvancedTrade.Enums;
 using Coinbase.AdvancedTrade.Interfaces;
 using Coinbase.AdvancedTrade.Models;
-using System.Text.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,9 +30,9 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<List<Order>?> ListOrdersAsync(
-            string? productId = null,
-            OrderStatus[]? orderStatus = null,
+        public async Task<List<Order>> ListOrdersAsync(
+            string productId = null,
+            OrderStatus[] orderStatus = null,
             DateTime? startDate = null,
             DateTime? endDate = null,
             OrderType? orderType = null,
@@ -41,11 +42,11 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             ValidateOrderStatus(orderStatus);
 
             // Use utility methods for conversion
-            string[]? orderStatusStrings = EnumToStringArray(orderStatus);
-            string? startDateString = FormatDateToISO8601(startDate);
-            string? endDateString = FormatDateToISO8601(endDate);
-            string? orderTypeString = orderType?.ToString();
-            string? orderSideString = orderSide?.ToString();
+            string[] orderStatusStrings = EnumToStringArray(orderStatus);
+            string startDateString = FormatDateToISO8601(startDate);
+            string endDateString = FormatDateToISO8601(endDate);
+            string orderTypeString = orderType?.ToString();
+            string orderSideString = orderSide?.ToString();
 
             // Create an anonymous object with the parameters
             var paramsObj = new
@@ -71,7 +72,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
         }
 
-        private static void ValidateOrderStatus(OrderStatus[]? orderStatus)
+        private static void ValidateOrderStatus(OrderStatus[] orderStatus)
         {
             if (orderStatus != null && orderStatus.Contains(OrderStatus.OPEN) && orderStatus.Length > 1)
             {
@@ -81,15 +82,15 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<List<Fill>?> ListFillsAsync(
-            string? orderId = null,
-            string? productId = null,
+        public async Task<List<Fill>> ListFillsAsync(
+            string orderId = null,
+            string productId = null,
             DateTime? startSequenceTimestamp = null,
             DateTime? endSequenceTimestamp = null)
         {
             // Convert DateTime to the desired ISO8601 format
-            string? startSequenceTimestampString = FormatDateToISO8601(startSequenceTimestamp);
-            string? endSequenceTimestampString = FormatDateToISO8601(endSequenceTimestamp);
+            string startSequenceTimestampString = FormatDateToISO8601(startSequenceTimestamp);
+            string endSequenceTimestampString = FormatDateToISO8601(endSequenceTimestamp);
 
             // Prepare request parameters using anonymous type
             var paramsObj = new
@@ -119,7 +120,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<Order?> GetOrderAsync(string orderId)
+        public async Task<Order> GetOrderAsync(string orderId)
         {
             // Validate input parameters
             if (string.IsNullOrWhiteSpace(orderId))
@@ -149,10 +150,10 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<List<CancelOrderResult>?> CancelOrdersAsync(string[] orderIds)
+        public async Task<List<CancelOrderResult>> CancelOrdersAsync(string[] orderIds)
         {
             // Validate the input parameter
-            if (orderIds is null or { Length: 0 })
+            if (orderIds == null || orderIds.Length == 0)
             {
                 throw new ArgumentException("Order IDs array cannot be null or empty.", nameof(orderIds));
             }
@@ -186,7 +187,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         /// <param name="side">Specifies whether to buy or sell.</param>
         /// <param name="orderConfiguration">Configuration details for the order.</param>
         /// <returns>Order ID upon successful order creation; otherwise, null.</returns>
-        private async Task<string?> CreateOrderAsync(string productId, OrderSide side, OrderConfiguration orderConfiguration)
+        private async Task<string> CreateOrderAsync(string productId, OrderSide side, OrderConfiguration orderConfiguration)
         {
             // Validate the provided product ID
             if (string.IsNullOrWhiteSpace(productId))
@@ -195,10 +196,11 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
 
             // Validate the order side
-            if (side is not OrderSide.BUY and not OrderSide.SELL) 
+            if (side != OrderSide.BUY && side != OrderSide.SELL)
             {
                 throw new ArgumentException("Invalid side value provided.", nameof(side));
             }
+
 
             // Ensure order configuration is provided
             if (orderConfiguration is null) 
@@ -229,7 +231,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                     var successResponseStr = successResponse?.ToString();
                     if (!string.IsNullOrEmpty(successResponseStr))
                     {
-                        var successResponseDict = JsonSerializer.Deserialize<Dictionary<string, string>>(successResponseStr);
+                        var successResponseDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(successResponseStr);
 
                         // If 'order_id' is present in the success response, return it
                         if (successResponseDict?.TryGetValue("order_id", out var orderId) == true)
@@ -246,14 +248,14 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                     var errorResponseObj = response["error_response"];
 
                     // Assuming errorResponseObj is a JsonElement
-                    if (errorResponseObj is JsonElement errorResponseElement)
+                    if (errorResponseObj is JObject errorResponseObject) // Check if the errorResponseObj is a JSON object
                     {
-                        var errorResponseValue = errorResponseElement.GetRawText(); // Get the raw JSON text
+                        var errorResponseValue = errorResponseObject.ToString(); // Get the raw JSON text of the object
 
                         if (!string.IsNullOrEmpty(errorResponseValue))
                         {
                             // Deserialize the error response from the raw text
-                            var errorResponse = JsonSerializer.Deserialize<Dictionary<string, string>>(errorResponseValue);
+                            var errorResponse = JsonConvert.DeserializeObject<Dictionary<string, string>>(errorResponseValue);
 
                             if (errorResponse != null)
                             {
@@ -286,7 +288,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<string?> CreateMarketOrderAsync(string productId, OrderSide side, string amount)
+        public async Task<string> CreateMarketOrderAsync(string productId, OrderSide side, string amount)
         {
             // Ensure the product ID is provided and not empty
             if (string.IsNullOrEmpty(productId))
@@ -295,12 +297,19 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
 
             // Determine the market order details based on the side (BUY or SELL)
-            MarketIoc marketDetails = side switch
+            MarketIoc marketDetails;
+            switch (side)
             {
-                OrderSide.BUY => new MarketIoc { QuoteSize = amount },   // Buy orders use the QuoteSize
-                OrderSide.SELL => new MarketIoc { BaseSize = amount },  // Sell orders use the BaseSize
-                _ => throw new ArgumentException($"Invalid order side provided: {side}.")
-            };
+                case OrderSide.BUY:
+                    marketDetails = new MarketIoc { QuoteSize = amount }; // Buy orders use the QuoteSize
+                    break;
+                case OrderSide.SELL:
+                    marketDetails = new MarketIoc { BaseSize = amount };  // Sell orders use the BaseSize
+                    break;
+                default:
+                    throw new ArgumentException($"Invalid order side provided: {side}.");
+            }
+
 
             // Create the order configuration using the determined market details
             var orderConfiguration = new OrderConfiguration
@@ -314,7 +323,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<string?> CreateLimitOrderGTCAsync(string productId, OrderSide side, string baseSize, string limitPrice, bool postOnly)
+        public async Task<string> CreateLimitOrderGTCAsync(string productId, OrderSide side, string baseSize, string limitPrice, bool postOnly)
         {
             // Validate input parameters
             if (string.IsNullOrEmpty(productId))
@@ -354,7 +363,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<string?> CreateLimitOrderGTDAsync(string productId, OrderSide side, string baseSize, string limitPrice, DateTime endTime, bool postOnly = true)
+        public async Task<string> CreateLimitOrderGTDAsync(string productId, OrderSide side, string baseSize, string limitPrice, DateTime endTime, bool postOnly = true)
         {
             // Validate input parameters
             if (string.IsNullOrEmpty(productId))
@@ -398,7 +407,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<string?> CreateStopLimitOrderGTCAsync(string productId, OrderSide side, string baseSize, string limitPrice, string stopPrice)
+        public async Task<string> CreateStopLimitOrderGTCAsync(string productId, OrderSide side, string baseSize, string limitPrice, string stopPrice)
         {
             // Validate input parameters
             if (string.IsNullOrEmpty(productId))
@@ -422,12 +431,19 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
 
             // Determine stop direction based on the side of the order (BUY or SELL)
-            string stopDirection = side switch
+            string stopDirection;
+            switch (side)
             {
-                OrderSide.BUY => "STOP_DIRECTION_STOP_UP",
-                OrderSide.SELL => "STOP_DIRECTION_STOP_DOWN",
-                _ => throw new ArgumentException($"Invalid order side provided: {side}.")
-            };
+                case OrderSide.BUY:
+                    stopDirection = "STOP_DIRECTION_STOP_UP";
+                    break;
+                case OrderSide.SELL:
+                    stopDirection = "STOP_DIRECTION_STOP_DOWN";
+                    break;
+                default:
+                    throw new ArgumentException($"Invalid order side provided: {side}.");
+            }
+
 
             // Construct the order configuration for a Stop Limit Order with GTC (Good Till Cancel)
             var orderConfig = new OrderConfiguration
@@ -448,7 +464,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<string?> CreateStopLimitOrderGTDAsync(string productId, OrderSide side, string baseSize, string limitPrice, string stopPrice, DateTime endTime)
+        public async Task<string> CreateStopLimitOrderGTDAsync(string productId, OrderSide side, string baseSize, string limitPrice, string stopPrice, DateTime endTime)
         {
             // Validate input parameters
             if (string.IsNullOrEmpty(productId))
@@ -477,12 +493,19 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
 
             // Determine stop direction based on the side of the order (BUY or SELL)
-            string stopDirection = side switch
+            string stopDirection;
+            switch (side)
             {
-                OrderSide.BUY => "STOP_DIRECTION_STOP_UP",
-                OrderSide.SELL => "STOP_DIRECTION_STOP_DOWN",
-                _ => throw new ArgumentException($"Invalid order side provided: {side}.")
-            };
+                case OrderSide.BUY:
+                    stopDirection = "STOP_DIRECTION_STOP_UP";
+                    break;
+                case OrderSide.SELL:
+                    stopDirection = "STOP_DIRECTION_STOP_DOWN";
+                    break;
+                default:
+                    throw new ArgumentException($"Invalid order side provided: {side}.");
+            }
+
 
             // Construct the order configuration for a Stop Limit Order with GTD (Good Till Date)
             var orderConfig = new OrderConfiguration
@@ -504,7 +527,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
-        public async Task<bool> EditOrderAsync(string orderId, string? price = null, string? size = null)
+        public async Task<bool> EditOrderAsync(string orderId, string price = null, string size = null)
         {
             if (string.IsNullOrEmpty(orderId))
             {
@@ -531,9 +554,9 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             try
             {
                 var response = await _authenticator.SendAuthenticatedRequestAsync("POST", "/api/v3/brokerage/orders/edit", null, requestBody) ?? new Dictionary<string, object>();
-                var responseObject = DeserializeDictionary<Dictionary<string, JsonElement>>(response);
+                var responseObject = DeserializeDictionary<Dictionary<string, JToken>>(response);
 
-                if (responseObject != null && responseObject.TryGetValue("success", out var successValue) && successValue.GetBoolean())
+                if (responseObject != null && responseObject.TryGetValue("success", out var successValue) && successValue.ToObject<bool>())
                 {
                     return true; // Operation was successful
                 }
@@ -541,12 +564,12 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                 // Start constructing the error message
                 var errorMessage = "Failed to edit order.";
 
-                if (responseObject?.TryGetValue("errors", out var errorsValue) == true && errorsValue.ValueKind == JsonValueKind.Array)
+                if (responseObject?.TryGetValue("errors", out var errorsValue) == true && errorsValue is JArray errorsArray && errorsArray.Any())
                 {
-                    var errorsArray = errorsValue.EnumerateArray().FirstOrDefault(); // Assuming the first element has the error details
-                    if (errorsArray.TryGetProperty("edit_failure_reason", out var failureReason))
+                    var errorDetails = errorsArray.FirstOrDefault();
+                    if (errorDetails != null && errorDetails["edit_failure_reason"] != null)
                     {
-                        errorMessage += $" Reason: {failureReason.GetString()}";
+                        errorMessage += $" Reason: {errorDetails["edit_failure_reason"]}";
                     }
                 }
 
@@ -589,29 +612,33 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             try
             {
                 var response = await _authenticator.SendAuthenticatedRequestAsync("POST", "/api/v3/brokerage/orders/edit_preview", null, requestBody) ?? new Dictionary<string, object>();
-                var responseObject = DeserializeDictionary<Dictionary<string, JsonElement>>(response);
+                var responseObject = DeserializeDictionary<Dictionary<string, JToken>>(response);
 
                 // Check if there are errors
-                if (responseObject != null && responseObject.TryGetValue("errors", out var errorsValue) && errorsValue.ValueKind == JsonValueKind.Array)
+                if (responseObject != null && responseObject.TryGetValue("errors", out var errorsValue) && errorsValue is JArray errorsArray && errorsArray.Any())
                 {
-                    // Get all error objects from the errors array
-                    var errorsArray = errorsValue.EnumerateArray().ToList();  // Convert to list for easier handling
+                    // Convert errorsValue to a JArray and check if it's not empty
+                    var errorsList = errorsArray.ToList();
 
-                    if (errorsArray.Any()) // Check if there are any error objects
+                    if (errorsList.Any())
                     {
                         var errorMessage = "Failed to preview order edit.";
 
-                        // Append all error messages if any
-                        foreach (var errorObj in errorsArray)
+                        // Iterate through error objects
+                        foreach (var errorObj in errorsList)
                         {
-                            if (errorObj.TryGetProperty("edit_failure_reason", out var editFailureReason))
+                            if (errorObj is JObject errorObject)
                             {
-                                errorMessage += $" Edit Failure Reason: {editFailureReason.GetString()}.";
-                            }
+                                // Check for specific properties within each error object
+                                if (errorObject.TryGetValue("edit_failure_reason", out var editFailureReason))
+                                {
+                                    errorMessage += $" Edit Failure Reason: {editFailureReason.ToString()}.";
+                                }
 
-                            if (errorObj.TryGetProperty("preview_failure_reason", out var previewFailureReason))
-                            {
-                                errorMessage += $" Preview Failure Reason: {previewFailureReason.GetString()}.";
+                                if (errorObject.TryGetValue("preview_failure_reason", out var previewFailureReason))
+                                {
+                                    errorMessage += $" Preview Failure Reason: {previewFailureReason.ToString()}.";
+                                }
                             }
                         }
 
@@ -622,15 +649,16 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                 // Assuming no errors or empty error array, populate the EditOrderPreviewResult from responseObject
                 var result = new EditOrderPreviewResult
                 {
-                    Slippage = responseObject?.GetValueOrDefault("slippage").GetString() ?? string.Empty,
-                    OrderTotal = responseObject?.GetValueOrDefault("order_total").GetString() ?? string.Empty,
-                    CommissionTotal = responseObject?.GetValueOrDefault("commission_total").GetString() ?? string.Empty,
-                    QuoteSize = responseObject?.GetValueOrDefault("quote_size").GetString() ?? string.Empty,
-                    BaseSize = responseObject?.GetValueOrDefault("base_size").GetString() ?? string.Empty,
-                    BestBid = responseObject?.GetValueOrDefault("best_bid").GetString() ?? string.Empty,
-                    BestAsk = responseObject?.GetValueOrDefault("best_ask").GetString() ?? string.Empty,
-                    AverageFilledPrice = responseObject?.GetValueOrDefault("average_filled_price").GetString() ?? string.Empty
+                    Slippage = responseObject.TryGetValue("slippage", out var tempValue) ? tempValue.ToString() : string.Empty,
+                    OrderTotal = responseObject.TryGetValue("order_total", out tempValue) ? tempValue.ToString() : string.Empty,
+                    CommissionTotal = responseObject.TryGetValue("commission_total", out tempValue) ? tempValue.ToString() : string.Empty,
+                    QuoteSize = responseObject.TryGetValue("quote_size", out tempValue) ? tempValue.ToString() : string.Empty,
+                    BaseSize = responseObject.TryGetValue("base_size", out tempValue) ? tempValue.ToString() : string.Empty,
+                    BestBid = responseObject.TryGetValue("best_bid", out tempValue) ? tempValue.ToString() : string.Empty,
+                    BestAsk = responseObject.TryGetValue("best_ask", out tempValue) ? tempValue.ToString() : string.Empty,
+                    AverageFilledPrice = responseObject.TryGetValue("average_filled_price", out tempValue) ? tempValue.ToString() : string.Empty
                 };
+
 
                 return result;
             }

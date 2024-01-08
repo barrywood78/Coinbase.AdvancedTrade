@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Coinbase.AdvancedTrade;
 using Coinbase.AdvancedTrade.Interfaces;
-using Coinbase.AdvancedTradeTest.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Coinbase.AdvancedTradeTest
@@ -23,16 +22,8 @@ namespace Coinbase.AdvancedTradeTest
             var apiSecret = Environment.GetEnvironmentVariable("COINBASE_API_SECRET", EnvironmentVariableTarget.User)
                            ?? throw new InvalidOperationException("API Secret not found");
 
-            UseLiveClient = bool.TryParse(TestContext?.Properties["UseLiveClient"]?.ToString(), out var useLive) && useLive;
-
-            _coinbaseClient = UseLiveClient
-                ? new CoinbaseClient(apiKey, apiSecret)
-                : new CoinbaseClient(
-                    MockSetupHelper.InitializeAccountsMock().Object,
-                    MockSetupHelper.InitializeProductsMock().Object,
-                    MockSetupHelper.InitializeOrdersMock().Object,
-                    MockSetupHelper.InitializeFeesMock().Object,
-                    MockSetupHelper.InitializeCommonMock().Object);
+       
+            _coinbaseClient = new CoinbaseClient(apiKey, apiSecret);
 
             _webSocketManager = _coinbaseClient?.WebSocket;
         }

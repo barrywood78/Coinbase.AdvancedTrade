@@ -36,7 +36,7 @@ namespace Coinbase.AdvancedTrade
         /// <summary>
         /// Gets the WebSocket manager, responsible for managing WebSocket connections.
         /// </summary>
-        public WebSocketManager? WebSocket { get; }
+        public WebSocketManager WebSocket { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CoinbaseClient"/> class for real-world usage.

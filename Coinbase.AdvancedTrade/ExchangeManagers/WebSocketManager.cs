@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Net.WebSockets;
+﻿using System.Net.WebSockets;
 using System.Text;
 using Coinbase.AdvancedTrade.Models.WebSocket;
-using System.Text.Json;
+using Newtonsoft.Json;
 using System.Security.Cryptography;
 using Coinbase.AdvancedTrade.Enums;
+using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace Coinbase.AdvancedTrade
 {
@@ -16,7 +20,7 @@ namespace Coinbase.AdvancedTrade
     public sealed class WebSocketManager : IDisposable
     {
         // WebSocket instance for managing the WebSocket connection.
-        private readonly ClientWebSocket _webSocket = new();
+        private readonly ClientWebSocket _webSocket = new ClientWebSocket();
 
         // The URI of the WebSocket server.
         private readonly Uri _webSocketUri;
@@ -28,10 +32,10 @@ namespace Coinbase.AdvancedTrade
         private readonly string _apiSecret;
 
         // Dictionary to map channel names to message processors.
-        private readonly Dictionary<string, Action<string>> _messageMap = new();
+        private readonly Dictionary<string, Action<string>> _messageMap = new Dictionary<string, Action<string>>();
 
         // Semaphore for controlling access to critical sections of the code.
-        private readonly SemaphoreSlim _semaphore = new(1, 1);
+        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
         // Flag to track whether the object has been disposed.
         private bool _disposed;
@@ -40,9 +44,12 @@ namespace Coinbase.AdvancedTrade
         private bool IsWebSocketOpen => _webSocket.State == WebSocketState.Open;
 
         // JSON serialization options for WebSocket messages.
-        private static readonly JsonSerializerOptions JsonOptions = new()
+        private static readonly JsonSerializerSettings JsonOptions = new JsonSerializerSettings
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new CamelCaseNamingStrategy()
+            }
         };
 
         // Property to get the current WebSocket status.
@@ -89,21 +96,32 @@ namespace Coinbase.AdvancedTrade
         /// </summary>
         /// <param name="channelType">The channel type to convert to a string.</param>
         /// <returns>The string representation of the channel type.</returns>
-        public static string GetChannelString(ChannelType channelType) =>
+        public static string GetChannelString(ChannelType channelType)
+        {
             // Use a switch statement to map the channel type to its string representation.
-            channelType switch
+            switch (channelType)
             {
-                ChannelType.Candles => "candles",
-                ChannelType.Heartbeats => "heartbeats",
-                ChannelType.MarketTrades => "market_trades",
-                ChannelType.Status => "status",
-                ChannelType.Ticker => "ticker",
-                ChannelType.TickerBatch => "ticker_batch",
-                ChannelType.Level2 => "level2",
-                ChannelType.User => "user",
-                // If an invalid channel type is provided, throw an exception.
-                _ => throw new ArgumentOutOfRangeException(nameof(channelType), channelType, "Invalid channel type provided.")
-            };
+                case ChannelType.Candles:
+                    return "candles";
+                case ChannelType.Heartbeats:
+                    return "heartbeats";
+                case ChannelType.MarketTrades:
+                    return "market_trades";
+                case ChannelType.Status:
+                    return "status";
+                case ChannelType.Ticker:
+                    return "ticker";
+                case ChannelType.TickerBatch:
+                    return "ticker_batch";
+                case ChannelType.Level2:
+                    return "level2";
+                case ChannelType.User:
+                    return "user";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(channelType), channelType, "Invalid channel type provided.");
+            }
+        }
+
 
 
 
@@ -170,7 +188,7 @@ namespace Coinbase.AdvancedTrade
         /// </summary>
         /// <param name="products">An optional array of product IDs to subscribe to.</param>
         /// <param name="channelType">The type of channel to subscribe to.</param>
-        public async ValueTask SubscribeAsync(string[]? products, ChannelType channelType)
+        public async ValueTask SubscribeAsync(string[] products, ChannelType channelType)
         {
             // Check if the provided channel type is valid.
             if (!Enum.IsDefined(typeof(ChannelType), channelType))
@@ -201,7 +219,7 @@ namespace Coinbase.AdvancedTrade
         /// </summary>
         /// <param name="products">An optional array of product IDs to unsubscribe from.</param>
         /// <param name="channelType">The type of channel to unsubscribe from.</param>
-        public async ValueTask UnsubscribeAsync(string[]? products, ChannelType channelType)
+        public async ValueTask UnsubscribeAsync(string[] products, ChannelType channelType)
         {
             // Check if the provided channel type is valid.
             if (!Enum.IsDefined(typeof(ChannelType), channelType))
@@ -232,7 +250,7 @@ namespace Coinbase.AdvancedTrade
         /// </summary>
         /// <param name="products">An optional array of product IDs to subscribe to.</param>
         /// <param name="channelName">The name of the channel to subscribe to.</param>
-        private async ValueTask SubscribeToChannelAsync(string[]? products, string channelName)
+        private async ValueTask SubscribeToChannelAsync(string[] products, string channelName)
         {
             // Check if the channel name is null and throw an exception if it is.
             if (channelName == null) throw new ArgumentNullException(nameof(channelName));
@@ -247,7 +265,7 @@ namespace Coinbase.AdvancedTrade
             var message = CreateSubscriptionMessage(products, channelName, "subscribe");
 
             // Serialize the message to JSON format.
-            var jsonString = JsonSerializer.Serialize(message, JsonOptions);
+            var jsonString = JsonConvert.SerializeObject(message, JsonOptions);
 
             // Convert the JSON message to a byte array for sending over the WebSocket.
             var byteData = Encoding.UTF8.GetBytes(jsonString);
@@ -264,7 +282,7 @@ namespace Coinbase.AdvancedTrade
         /// </summary>
         /// <param name="products">An optional array of product IDs to unsubscribe from.</param>
         /// <param name="channelName">The name of the channel to unsubscribe from.</param>
-        private async ValueTask UnsubscribeFromChannelAsync(string[]? products, string channelName)
+        private async ValueTask UnsubscribeFromChannelAsync(string[] products, string channelName)
         {
             // Check if the channel name is null and throw an exception if it is.
             if (channelName == null) throw new ArgumentNullException(nameof(channelName));
@@ -279,7 +297,7 @@ namespace Coinbase.AdvancedTrade
             var message = CreateSubscriptionMessage(products, channelName, "unsubscribe");
 
             // Serialize the message to JSON format.
-            var jsonString = JsonSerializer.Serialize(message, JsonOptions);
+            var jsonString = JsonConvert.SerializeObject(message, JsonOptions);
 
             // Convert the JSON message to a byte array for sending over the WebSocket.
             var byteData = Encoding.UTF8.GetBytes(jsonString);
@@ -298,7 +316,7 @@ namespace Coinbase.AdvancedTrade
         /// <param name="channelName">The name of the channel to subscribe or unsubscribe from.</param>
         /// <param name="type">The type of the subscription message (subscribe or unsubscribe).</param>
         /// <returns>A subscription message object in JSON format.</returns>
-        private object CreateSubscriptionMessage(string[]? products, string channelName, string type)
+        private object CreateSubscriptionMessage(string[] products, string channelName, string type)
         {
             // Check if the channel name or type is null or empty and throw exceptions if they are.
             if (string.IsNullOrWhiteSpace(channelName)) throw new ArgumentNullException(nameof(channelName));
@@ -308,7 +326,7 @@ namespace Coinbase.AdvancedTrade
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 
             // Create a comma-separated string of product IDs or an empty string if products is null.
-            var productsString = products != null ? string.Join(',', products) : string.Empty;
+            var productsString = products != null ? string.Join(",", products) : string.Empty;
 
             // Concatenate the timestamp, channel name, and product IDs (if any) to create a string to sign.
             var stringToSign = $"{timestamp}{channelName}{productsString}";
@@ -343,23 +361,25 @@ namespace Coinbase.AdvancedTrade
             if (string.IsNullOrWhiteSpace(secret)) throw new ArgumentNullException(nameof(secret));
 
             // Create an instance of HMACSHA256 with the secret key as the key.
-            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret));
-
-            // Compute the hash of the data using HMACSHA256.
-            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
-
-            // Create a StringBuilder to store the hexadecimal representation of the hash.
-            var sb = new StringBuilder(hash.Length * 2);
-
-            // Convert each byte of the hash to a two-character lowercase hexadecimal string and append it to the StringBuilder.
-            foreach (byte b in hash)
+            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret)))
             {
-                sb.Append(b.ToString("x2")); // x2 formats the byte as a two-character lowercase hexadecimal string
-            }
+                // Compute the hash of the data using HMACSHA256.
+                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
 
-            // Return the hexadecimal representation of the computed signature.
-            return sb.ToString();
+                // Create a StringBuilder to store the hexadecimal representation of the hash.
+                var sb = new StringBuilder(hash.Length * 2);
+
+                // Convert each byte of the hash to a two-character lowercase hexadecimal string and append it to the StringBuilder.
+                foreach (byte b in hash)
+                {
+                    sb.Append(b.ToString("x2")); // x2 formats the byte as a two-character lowercase hexadecimal string
+                }
+
+                // Return the hexadecimal representation of the computed signature.
+                return sb.ToString();
+            }
         }
+
 
 
 
@@ -369,13 +389,13 @@ namespace Coinbase.AdvancedTrade
         /// <typeparam name="T">The type to deserialize the message into.</typeparam>
         /// <param name="message">The WebSocket message to process.</param>
         /// <param name="eventInvoker">The event handler to invoke after deserialization.</param>
-        private void ProcessMessage<T>(string message, EventHandler<WebSocketMessageEventArgs<T>>? eventInvoker)
+        private void ProcessMessage<T>(string message, EventHandler<WebSocketMessageEventArgs<T>> eventInvoker)
         {
             // Check if the message is null or empty and throw an exception if it is.
             if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
             // Deserialize the WebSocket message into the specified type.
-            var deserializedMessage = JsonSerializer.Deserialize<T>(message);
+            var deserializedMessage = JsonConvert.DeserializeObject<T>(message);
 
             // Check if the deserialized message is not null and if an event handler is provided.
             if (deserializedMessage != null && eventInvoker != null)
@@ -397,12 +417,12 @@ namespace Coinbase.AdvancedTrade
             if (string.IsNullOrWhiteSpace(message)) throw new ArgumentNullException(nameof(message));
 
             // Deserialize the WebSocket message into a JSON element.
-            var jsonElement = JsonSerializer.Deserialize<JsonElement>(message);
+            var jsonObject = JsonConvert.DeserializeObject<JObject>(message);
 
             // Check if the JSON element contains a "channel" property and if its value is a string.
-            if (jsonElement.TryGetProperty("channel", out var channelProperty)
-                && channelProperty.GetString() is string channelString
-                && _messageMap.TryGetValue(channelString, out var processor))
+            if (jsonObject.TryGetValue("channel", out JToken channelToken)
+                && channelToken.Type == JTokenType.String
+                && _messageMap.TryGetValue((string)channelToken, out var processor))
             {
                 // If a message processor is found for the channel, invoke it with the original message.
                 processor(message);
@@ -481,47 +501,47 @@ namespace Coinbase.AdvancedTrade
         /// <summary>
         /// Event raised when a WebSocket message is received.
         /// </summary>
-        public event EventHandler<MessageEventArgs>? MessageReceived;
+        public event EventHandler<MessageEventArgs> MessageReceived;
 
         /// <summary>
         /// Event raised when a WebSocket message of type <see cref="CandleMessage"/> is received.
         /// </summary>
-        public event EventHandler<WebSocketMessageEventArgs<CandleMessage>>? CandleMessageReceived;
+        public event EventHandler<WebSocketMessageEventArgs<CandleMessage>> CandleMessageReceived;
 
         /// <summary>
         /// Event raised when a WebSocket message of type <see cref="HeartbeatMessage"/> is received.
         /// </summary>
-        public event EventHandler<WebSocketMessageEventArgs<HeartbeatMessage>>? HeartbeatMessageReceived;
+        public event EventHandler<WebSocketMessageEventArgs<HeartbeatMessage>> HeartbeatMessageReceived;
 
         /// <summary>
         /// Event raised when a WebSocket message of type <see cref="MarketTradesMessage"/> is received.
         /// </summary>
-        public event EventHandler<WebSocketMessageEventArgs<MarketTradesMessage>>? MarketTradeMessageReceived;
+        public event EventHandler<WebSocketMessageEventArgs<MarketTradesMessage>> MarketTradeMessageReceived;
 
         /// <summary>
         /// Event raised when a WebSocket message of type <see cref="StatusMessage"/> is received.
         /// </summary>
-        public event EventHandler<WebSocketMessageEventArgs<StatusMessage>>? StatusMessageReceived;
+        public event EventHandler<WebSocketMessageEventArgs<StatusMessage>> StatusMessageReceived;
 
         /// <summary>
         /// Event raised when a WebSocket message of type <see cref="TickerMessage"/> is received.
         /// </summary>
-        public event EventHandler<WebSocketMessageEventArgs<TickerMessage>>? TickerMessageReceived;
+        public event EventHandler<WebSocketMessageEventArgs<TickerMessage>> TickerMessageReceived;
 
         /// <summary>
         /// Event raised when a WebSocket message of type <see cref="TickerMessage"/> is received in batch.
         /// </summary>
-        public event EventHandler<WebSocketMessageEventArgs<TickerMessage>>? TickerBatchMessageReceived;
+        public event EventHandler<WebSocketMessageEventArgs<TickerMessage>> TickerBatchMessageReceived;
 
         /// <summary>
         /// Event raised when a WebSocket message of type <see cref="Level2Message"/> is received.
         /// </summary>
-        public event EventHandler<WebSocketMessageEventArgs<Level2Message>>? Level2MessageReceived;
+        public event EventHandler<WebSocketMessageEventArgs<Level2Message>> Level2MessageReceived;
 
         /// <summary>
         /// Event raised when a WebSocket message of type <see cref="UserMessage"/> is received.
         /// </summary>
-        public event EventHandler<WebSocketMessageEventArgs<UserMessage>>? UserMessageReceived;
+        public event EventHandler<WebSocketMessageEventArgs<UserMessage>> UserMessageReceived;
 
 
 
@@ -587,8 +607,14 @@ namespace Coinbase.AdvancedTrade
         /// <param name="message">The WebSocket message.</param>
         public WebSocketMessageEventArgs(T message)
         {
-            Message = message ?? throw new ArgumentNullException(nameof(message));
+            if (message == null)
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
+
+            Message = message;
         }
+
     }
 
 

@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace Coinbase.AdvancedTrade.Models
 {
@@ -10,32 +10,32 @@ namespace Coinbase.AdvancedTrade.Models
         /// <summary>
         /// Gets or sets the pricing tier identifier.
         /// </summary>
-        [JsonPropertyName("pricing_tier")]
-        public string? PricingTier { get; set; }
+        [JsonProperty("pricing_tier")]
+        public string PricingTier { get; set; }
 
         /// <summary>
         /// Gets or sets the starting USD value for this tier.
         /// </summary>
-        [JsonPropertyName("usd_from")]
-        public string? UsdFrom { get; set; }
+        [JsonProperty("usd_from")]
+        public string UsdFrom { get; set; }
 
         /// <summary>
         /// Gets or sets the ending USD value for this tier.
         /// </summary>
-        [JsonPropertyName("usd_to")]
-        public string? UsdTo { get; set; }
+        [JsonProperty("usd_to")]
+        public string UsdTo { get; set; }
 
         /// <summary>
         /// Gets or sets the fee rate for takers in this tier.
         /// </summary>
-        [JsonPropertyName("taker_fee_rate")]
-        public string? TakerFeeRate { get; set; }
+        [JsonProperty("taker_fee_rate")]
+        public string TakerFeeRate { get; set; }
 
         /// <summary>
         /// Gets or sets the fee rate for makers in this tier.
         /// </summary>
-        [JsonPropertyName("maker_fee_rate")]
-        public string? MakerFeeRate { get; set; }
+        [JsonProperty("maker_fee_rate")]
+        public string MakerFeeRate { get; set; }
     }
 
     /// <summary>
@@ -46,8 +46,8 @@ namespace Coinbase.AdvancedTrade.Models
         /// <summary>
         /// Gets or sets the value of the margin rate.
         /// </summary>
-        [JsonPropertyName("value")]
-        public string? Value { get; set; }
+        [JsonProperty("value")]
+        public string Value { get; set; }
     }
 
     /// <summary>
@@ -58,14 +58,14 @@ namespace Coinbase.AdvancedTrade.Models
         /// <summary>
         /// Gets or sets the tax rate value.
         /// </summary>
-        [JsonPropertyName("rate")]
-        public string? Rate { get; set; }
+        [JsonProperty("rate")]
+        public string Rate { get; set; }
 
         /// <summary>
         /// Gets or sets the type of tax applied (e.g., GST, VAT).
         /// </summary>
-        [JsonPropertyName("type")]
-        public string? Type { get; set; }
+        [JsonProperty("type")]
+        public string Type { get; set; }
     }
 
     /// <summary>
@@ -76,61 +76,61 @@ namespace Coinbase.AdvancedTrade.Models
         /// <summary>
         /// Gets or sets the total trade volume.
         /// </summary>
-        [JsonPropertyName("total_volume")]
+        [JsonProperty("total_volume")]
         public double TotalVolume { get; set; }
 
         /// <summary>
         /// Gets or sets the total fees accumulated from trades.
         /// </summary>
-        [JsonPropertyName("total_fees")]
+        [JsonProperty("total_fees")]
         public double TotalFees { get; set; }
 
         /// <summary>
         /// Gets or sets the fee tier information for the trades.
         /// </summary>
-        [JsonPropertyName("fee_tier")]
-        public FeeTier? FeeTier { get; set; }
+        [JsonProperty("fee_tier")]
+        public FeeTier FeeTier { get; set; }
 
         /// <summary>
         /// Gets or sets the margin rate applied to the trades.
         /// </summary>
-        [JsonPropertyName("margin_rate")]
-        public MarginRate? MarginRate { get; set; }
+        [JsonProperty("margin_rate")]
+        public MarginRate MarginRate { get; set; }
 
         /// <summary>
         /// Gets or sets the goods and services tax information.
         /// </summary>
-        [JsonPropertyName("goods_and_services_tax")]
-        public GoodsAndServicesTax? GoodsAndServicesTax { get; set; }
+        [JsonProperty("goods_and_services_tax")]
+        public GoodsAndServicesTax GoodsAndServicesTax { get; set; }
 
         /// <summary>
         /// Gets or sets the trade volume specific to Advanced Trade.
         /// </summary>
-        [JsonPropertyName("advanced_trade_only_volume")]
+        [JsonProperty("advanced_trade_only_volume")]
         public double AdvancedTradeOnlyVolume { get; set; }
 
         /// <summary>
         /// Gets or sets the total fees specific to Advanced Trade.
         /// </summary>
-        [JsonPropertyName("advanced_trade_only_fees")]
+        [JsonProperty("advanced_trade_only_fees")]
         public double AdvancedTradeOnlyFees { get; set; }
 
         /// <summary>
         /// Gets or sets the trade volume specific to Coinbase Pro.
         /// </summary>
-        [JsonPropertyName("coinbase_pro_volume")]
+        [JsonProperty("coinbase_pro_volume")]
         public double CoinbaseProVolume { get; set; }
 
         /// <summary>
         /// Gets or sets the total fees specific to Coinbase Pro.
         /// </summary>
-        [JsonPropertyName("coinbase_pro_fees")]
+        [JsonProperty("coinbase_pro_fees")]
         public double CoinbaseProFees { get; set; }
 
         /// <summary>
         /// Gets or sets the low value for a given period.
         /// </summary>
-        [JsonPropertyName("low")]
+        [JsonProperty("low")]
         public double Low { get; set; }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Coinbase.AdvancedTrade.Models.WebSocket
 {
@@ -9,31 +9,31 @@ namespace Coinbase.AdvancedTrade.Models.WebSocket
     /// </summary>
     public class CandleMessage
     {
-        [JsonPropertyName("channel")]
-        public string? Channel { get; set; }
+        [JsonProperty("channel")]
+        public string Channel { get; set; }
 
-        [JsonPropertyName("client_id")]
-        public string? ClientId { get; set; }
+        [JsonProperty("client_id")]
+        public string ClientId { get; set; }
 
-        [JsonPropertyName("timestamp")]
-        public string? Timestamp { get; set; }
+        [JsonProperty("timestamp")]
+        public string Timestamp { get; set; }
 
-        [JsonPropertyName("sequence_num")]
+        [JsonProperty("sequence_num")]
         public long SequenceNumber { get; set; }
 
-        [JsonPropertyName("events")]
-        public List<Event>? Events { get; set; }
+        [JsonProperty("events")]
+        public List<Event> Events { get; set; }
 
         /// <summary>
         /// Represents a specific event within the candle message.
         /// </summary>
         public class Event
         {
-            [JsonPropertyName("type")]
-            public string? Type { get; set; }
+            [JsonProperty("type")]
+            public string Type { get; set; }
 
-            [JsonPropertyName("candles")]
-            public List<Candle>? Candles { get; set; }
+            [JsonProperty("candles")]
+            public List<Candle> Candles { get; set; }
         }
     }
 
@@ -42,26 +42,26 @@ namespace Coinbase.AdvancedTrade.Models.WebSocket
     /// </summary>
     public class Candle
     {
-        [JsonPropertyName("start")]
-        public string? StartUnix { get; set; }
+        [JsonProperty("start")]
+        public string StartUnix { get; set; }
 
-        [JsonPropertyName("high")]
-        public string? High { get; set; }
+        [JsonProperty("high")]
+        public string High { get; set; }
 
-        [JsonPropertyName("low")]
-        public string? Low { get; set; }
+        [JsonProperty("low")]
+        public string Low { get; set; }
 
-        [JsonPropertyName("open")]
-        public string? Open { get; set; }
+        [JsonProperty("open")]
+        public string Open { get; set; }
 
-        [JsonPropertyName("close")]
-        public string? Close { get; set; }
+        [JsonProperty("close")]
+        public string Close { get; set; }
 
-        [JsonPropertyName("volume")]
-        public string? Volume { get; set; }
+        [JsonProperty("volume")]
+        public string Volume { get; set; }
 
-        [JsonPropertyName("product_id")]
-        public string? ProductId { get; set; }
+        [JsonProperty("product_id")]
+        public string ProductId { get; set; }
 
         /// <summary>
         /// Translates the Unix timestamp to a DateTime object.
@@ -74,7 +74,7 @@ namespace Coinbase.AdvancedTrade.Models.WebSocket
         /// </summary>
         /// <param name="unixTimeStamp">The Unix timestamp string.</param>
         /// <returns>The converted DateTime object.</returns>
-        private static DateTime UnixTimeStampToDateTime(string? unixTimeStamp)
+        private static DateTime UnixTimeStampToDateTime(string unixTimeStamp)
         {
             if (long.TryParse(unixTimeStamp, out long parsedUnixTime))
             {

@@ -11,6 +11,6 @@ namespace Coinbase.AdvancedTrade.Interfaces
         /// <returns>The server time details including ISO 8601 formatted date and time,
         /// number of seconds since Unix epoch, and number of milliseconds since Unix epoch,
         /// or null if the information is not available.</returns>
-        Task<ServerTime?> GetCoinbaseServerTimeAsync();
+        Task<ServerTime> GetCoinbaseServerTimeAsync();
     }
 }
