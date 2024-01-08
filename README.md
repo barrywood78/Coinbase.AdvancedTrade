@@ -73,6 +73,3 @@ Fine-tuned enumerations like `OrderStatus`, `OrderType`, and others, ensuring cl
 The `Coinbase API Wrapper` is accompanied by a suite of tests, ensuring its reliability and functionality.
 
 - **Test Coverage**: Tests cover key functionalities including (but not limited to) authentication, order management, and WebSocket communication.
-- **Framework**: We utilize `[Name of the Testing Framework, e.g., NUnit]` for our tests.
-- **Running Tests**: Navigate to the `tests` directory and run `command-to-run-tests` to execute the test suite.
-- **Contribution**: If you're contributing to the project, please ensure your contributions are accompanied by relevant tests.
