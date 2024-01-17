@@ -31,6 +31,8 @@ namespace Coinbase.AdvancedTrade
         // The API secret used for authentication.
         private readonly string _apiSecret;
 
+        private readonly ApiKeyType _apiKeyType;
+
         // Dictionary to map channel names to message processors.
         private readonly Dictionary<string, Action<string>> _messageMap = new Dictionary<string, Action<string>>();
 
@@ -63,7 +65,7 @@ namespace Coinbase.AdvancedTrade
         /// <param name="webSocketUri">The URI of the WebSocket server.</param>
         /// <param name="apiKey">The API key used for authentication.</param>
         /// <param name="apiSecret">The API secret used for authentication.</param>
-        public WebSocketManager(string webSocketUri, string apiKey, string apiSecret)
+        public WebSocketManager(string webSocketUri, string apiKey, string apiSecret, ApiKeyType apiKeyType = ApiKeyType.Legacy)
         {
             // Check for null or empty values and throw exceptions if necessary.
             if (string.IsNullOrWhiteSpace(webSocketUri)) throw new ArgumentNullException(nameof(webSocketUri));
@@ -74,6 +76,7 @@ namespace Coinbase.AdvancedTrade
             _webSocketUri = new Uri(webSocketUri);
             _apiKey = apiKey;
             _apiSecret = apiSecret;
+            _apiKeyType = apiKeyType;
 
             // Initialize the message map, mapping channel names to message processors.
             _messageMap = new Dictionary<string, Action<string>>
@@ -310,41 +313,56 @@ namespace Coinbase.AdvancedTrade
 
 
         /// <summary>
-        /// Creates a subscription message object to be sent over the WebSocket.
+        /// Creates a subscription message object for WebSocket communication.
+        /// The message object is structured differently based on the type of API key used.
         /// </summary>
         /// <param name="products">An optional array of product IDs to include in the subscription.</param>
-        /// <param name="channelName">The name of the channel to subscribe or unsubscribe from.</param>
-        /// <param name="type">The type of the subscription message (subscribe or unsubscribe).</param>
+        /// <param name="channelName">The name of the channel to subscribe to or unsubscribe from.</param>
+        /// <param name="type">The type of the subscription message (e.g., 'subscribe' or 'unsubscribe').</param>
         /// <returns>A subscription message object in JSON format.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if channelName or type is null or empty.</exception>
         private object CreateSubscriptionMessage(string[] products, string channelName, string type)
         {
-            // Check if the channel name or type is null or empty and throw exceptions if they are.
-            if (string.IsNullOrWhiteSpace(channelName)) throw new ArgumentNullException(nameof(channelName));
-            if (string.IsNullOrWhiteSpace(type)) throw new ArgumentNullException(nameof(type));
+            // Validate parameters to ensure they are not null or empty
+            if (string.IsNullOrWhiteSpace(channelName))
+                throw new ArgumentNullException(nameof(channelName));
+            if (string.IsNullOrWhiteSpace(type))
+                throw new ArgumentNullException(nameof(type));
 
-            // Get the current timestamp in Unix time seconds format.
+            // Get the current timestamp in Unix time seconds format
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 
-            // Create a comma-separated string of product IDs or an empty string if products is null.
-            var productsString = products != null ? string.Join(",", products) : string.Empty;
-
-            // Concatenate the timestamp, channel name, and product IDs (if any) to create a string to sign.
-            var stringToSign = $"{timestamp}{channelName}{productsString}";
-
-            // Calculate the signature using the provided secret key.
-            var signature = ComputeSignature(stringToSign, _apiSecret);
-
-            // Create a subscription message object with the required properties.
-            return new
+            // Initialize the base message structure
+            var message = new Dictionary<string, object>
             {
-                type,
-                product_ids = products,
-                channel = channelName,
-                api_key = _apiKey,
-                timestamp,
-                signature
+                {"type", type},
+                {"product_ids", products},
+                {"channel", channelName},
+                {"api_key", _apiKey},
+                {"timestamp", timestamp}
             };
+
+            // Depending on the API key type, add either JWT or a signature
+            if (_apiKeyType == ApiKeyType.CloudTrading)
+            {
+                // Generate JWT for Cloud Trading keys
+                var jwt = JwtTokenGenerator.GenerateJwt(_apiKey, _apiSecret, "public_websocket_api");
+                message.Add("jwt", jwt);
+            }
+            else
+            {
+                // For Legacy keys, generate a signature
+                var productsString = products != null ? string.Join(",", products) : string.Empty;
+                var stringToSign = $"{timestamp}{channelName}{productsString}";
+                var signature = ComputeSignature(stringToSign, _apiSecret);
+                message.Add("signature", signature);
+            }
+
+            // Return the constructed message
+            return message;
         }
+
+
 
 
 

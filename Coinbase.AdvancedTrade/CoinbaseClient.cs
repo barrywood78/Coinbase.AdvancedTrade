@@ -1,4 +1,5 @@
-﻿using Coinbase.AdvancedTrade.ExchangeManagers;
+﻿using Coinbase.AdvancedTrade.Enums;
+using Coinbase.AdvancedTrade.ExchangeManagers;
 using Coinbase.AdvancedTrade.Interfaces;
 
 namespace Coinbase.AdvancedTrade
@@ -39,35 +40,30 @@ namespace Coinbase.AdvancedTrade
         public WebSocketManager WebSocket { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CoinbaseClient"/> class for real-world usage.
+        /// Initializes a new instance of the <see cref="CoinbaseClient"/> class for interacting with the Coinbase API.
         /// </summary>
-        /// <param name="apiKey">The API key for authentication.</param>
-        /// <param name="apiSecret">The API secret for authentication.</param>
-        public CoinbaseClient(string apiKey, string apiSecret)
+        /// <param name="apiKey">The API key for authentication with Coinbase.</param>
+        /// <param name="apiSecret">The API secret for authentication with Coinbase.</param>
+        /// <param name="apiKeyType">Specifies the type of API key used. This can be either a Legacy key or a Cloud Trading key.
+        ///     The Legacy key type uses HMACSHA256 signatures for authentication. The Cloud Trading key type uses JWT (JSON Web Token) for authentication.
+        ///     The default is set to Legacy for backward compatibility.</param>
+        public CoinbaseClient(string apiKey, string apiSecret, ApiKeyType apiKeyType = ApiKeyType.Legacy)
         {
-            var authenticator = new CoinbaseAuthenticator(apiKey, apiSecret);
+            // Create an instance of CoinbaseAuthenticator with the provided credentials and API key type
+            var authenticator = new CoinbaseAuthenticator(apiKey, apiSecret, apiKeyType);
+
+            // Initialize various service managers with the authenticator
             Accounts = new AccountsManager(authenticator);
             Products = new ProductsManager(authenticator);
             Orders = new OrdersManager(authenticator);
             Fees = new FeesManager(authenticator);
             Common = new CommonManager(authenticator);
-            WebSocket = new WebSocketManager("wss://advanced-trade-ws.coinbase.com", apiKey, apiSecret);
+
+            // Initialize WebSocketManager for real-time data feed
+            WebSocket = new WebSocketManager("wss://advanced-trade-ws.coinbase.com", apiKey, apiSecret, apiKeyType);
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CoinbaseClient"/> class for testing purposes.
-        /// </summary>
-        /// <param name="accounts">The mock or stub accounts manager for testing.</param>
-        /// <param name="products">The mock or stub products manager for testing.</param>
-        /// <param name="orders">The mock or stub orders manager for testing.</param>
-        /// <param name="fees">The mock or stub fees manager for testing.</param>
-        public CoinbaseClient(IAccountsManager accounts, IProductsManager products, IOrdersManager orders, IFeesManager fees, ICommonManager common)
-        {
-            Accounts = accounts;
-            Products = products;
-            Orders = orders;
-            Fees = fees;
-            Common = common;
-        }
+
+
     }
 }

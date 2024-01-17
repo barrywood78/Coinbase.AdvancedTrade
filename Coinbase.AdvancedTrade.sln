@@ -23,9 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketUserTestApp", "Web
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B03447D-8DFB-44A0-8D96-C2F56DFC9167}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coinbase.AdvancedTrade.IntegrationTests", "Coinbase.AdvancedTrade.Test\Coinbase.AdvancedTrade.IntegrationTests.csproj", "{17B9322F-B5FA-477A-94CE-5FDB2FE60E9F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework.4.8.TestApp", "Framework.4.8.TestApp\Framework.4.8.TestApp.csproj", "{51F3D673-00A5-4A0C-937E-6F00B74377D2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coinbase.AdvancedTrade.IntegrationTests", "Coinbase.AdvancedTrade.IntegrationTests\Coinbase.AdvancedTrade.IntegrationTests.csproj", "{27BD417D-8326-4415-B57B-7A9CA81E9E8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,14 +69,14 @@ Global
 		{3648ED4D-CD32-44ED-B5B3-482A8AE54287}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3648ED4D-CD32-44ED-B5B3-482A8AE54287}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3648ED4D-CD32-44ED-B5B3-482A8AE54287}.Release|Any CPU.Build.0 = Release|Any CPU
-		{17B9322F-B5FA-477A-94CE-5FDB2FE60E9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17B9322F-B5FA-477A-94CE-5FDB2FE60E9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17B9322F-B5FA-477A-94CE-5FDB2FE60E9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17B9322F-B5FA-477A-94CE-5FDB2FE60E9F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{51F3D673-00A5-4A0C-937E-6F00B74377D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{51F3D673-00A5-4A0C-937E-6F00B74377D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51F3D673-00A5-4A0C-937E-6F00B74377D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51F3D673-00A5-4A0C-937E-6F00B74377D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27BD417D-8326-4415-B57B-7A9CA81E9E8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27BD417D-8326-4415-B57B-7A9CA81E9E8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27BD417D-8326-4415-B57B-7A9CA81E9E8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27BD417D-8326-4415-B57B-7A9CA81E9E8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

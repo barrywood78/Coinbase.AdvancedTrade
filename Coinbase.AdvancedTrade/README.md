@@ -1,7 +1,15 @@
-
 # Coinbase API Wrapper for Advanced Trade
 
-This project provides a C# wrapper for the [Coinbase Advanced Trade API](https://docs.cloud.coinbase.com/advanced-trade-api), facilitating interactions with various advanced trading functionalities on Coinbase.
+This project provides a C# wrapper for the [Coinbase Advanced Trade API](https://docs.cloud.coinbase.com/advanced-trade-api), facilitating interactions with various advanced trading functionalities on Coinbase. 
+
+It now supports both legacy API keys and the new Cloud API Trading Keys, which utilize JWT for authentication. For more details on Cloud API Trading Keys, see [Coinbase's documentation](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-auth#cloud-api-trading-keys).
+
+For Cloud API Trading Keys, the `key_name` and `key_secret` are expected to follow this structure as per Coinbase:
+
+- key: `"organizations/{org_id}/apiKeys/{key_id}"`
+- secret: `"-----BEGIN EC PRIVATE KEY-----\nYOUR PRIVATE KEY\n-----END EC PRIVATE KEY-----\n"`
+
+
 
 **[View the Changelog](#changelog)** - See the detailed log of changes including updates, enhancements, and important notes.
 
@@ -26,10 +34,9 @@ Collection of models capturing the essence of various entities and data structur
 ## Classes
 
 ### `CoinbaseClient`
-Your gateway to the vast functionalities of the Coinbase API.
-- **Methods**:
-  - `Constructor`: Sets the stage by initializing managers for accounts, products, orders, fees, and WebSocket connections using the provided API credentials.
-  - `Test Constructor`: Tailored for testing, this initializes managers using mock or stub implementations.
+Your gateway to the vast functionalities of the Coinbase API, supporting both legacy API keys and new Cloud API Trading Keys.
+- **Constructor**: `public CoinbaseClient(string apiKey, string apiSecret, ApiKeyType apiKeyType = ApiKeyType.Legacy)`
+  - Initializes managers for accounts, products, orders, fees, and WebSocket connections using the provided API credentials. The `apiKeyType` parameter allows for the selection of either `Legacy` or `CloudTrading` keys.
 
 ### `CoinbaseAuthenticator`
 A sentinel that ensures every API request is authenticated.
@@ -73,7 +80,12 @@ Fine-tuned enumerations like `OrderStatus`, `OrderType`, and others, ensuring cl
 
 # Changelog
 
-## 2024-JAN-08
+## v1.2 - 2024-JAN-17
+- **Added Support for Cloud API Trading Keys**: The wrapper now supports the new Cloud API Trading Keys that utilize JWT for authentication. This enhances the flexibility in API key usage and provides an updated authentication mechanism.
+- **Updated `CoinbaseClient` Constructor**: The `CoinbaseClient` constructor has been updated to include the `apiKeyType` parameter, allowing users to specify the type of API key (`Legacy` or `CloudTrading`).
+- **IntelliSense**: Added comprehensive IntelliSense to methods and parameters.
+
+## v1.1 - 2024-JAN-08
 - **Changed Target Frameworks**: Changed project's target frameworks to .NET Standard 2.0, .NET 8, and .NET Framework 4.8
 
 ## 2024-JAN-07 Update

@@ -3,12 +3,20 @@ using Coinbase.AdvancedTrade.Enums;
 
 bool _isCleanupDone = false;
 
-var apiKey = Environment.GetEnvironmentVariable("COINBASE_API_KEY", EnvironmentVariableTarget.User)
-             ?? throw new InvalidOperationException("API Key not found");
-var apiSecret = Environment.GetEnvironmentVariable("COINBASE_API_SECRET", EnvironmentVariableTarget.User)
-               ?? throw new InvalidOperationException("API Secret not found");
+// Coinbase Legacy API Keys
+//var apiKey = Environment.GetEnvironmentVariable("COINBASE_API_KEY", EnvironmentVariableTarget.User)
+//             ?? throw new InvalidOperationException("API Key not found");
+//var apiSecret = Environment.GetEnvironmentVariable("COINBASE_API_SECRET", EnvironmentVariableTarget.User)
+//               ?? throw new InvalidOperationException("API Secret not found");
+//var coinbaseClient = new CoinbaseClient(apiKey, apiSecret);
 
-var coinbaseClient = new CoinbaseClient(apiKey, apiSecret);
+// Coinbase Cloud Trading Keys
+var apiKey = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_KEY", EnvironmentVariableTarget.User)
+             ?? throw new InvalidOperationException("API Key not found");
+var apiSecret = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_SECRET", EnvironmentVariableTarget.User)
+               ?? throw new InvalidOperationException("API Secret not found");
+var coinbaseClient = new CoinbaseClient(apiKey, apiSecret, ApiKeyType.CloudTrading);
+
 WebSocketManager? webSocketManager = coinbaseClient.WebSocket;
 
 AppDomain.CurrentDomain.ProcessExit += async (s, e) => await CleanupAsync(webSocketManager);
