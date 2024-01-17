@@ -13,12 +13,19 @@ namespace Framework._4._8.TestApp
 
         static async Task Main(string[] args)
         {
-            var apiKey = Environment.GetEnvironmentVariable("COINBASE_API_KEY", EnvironmentVariableTarget.User)
-                         ?? throw new InvalidOperationException("API Key not found");
-            var apiSecret = Environment.GetEnvironmentVariable("COINBASE_API_SECRET", EnvironmentVariableTarget.User)
-                           ?? throw new InvalidOperationException("API Secret not found");
+            // Coinbase Legacy API Keys
+            //var apiKey = Environment.GetEnvironmentVariable("COINBASE_API_KEY", EnvironmentVariableTarget.User)
+            //             ?? throw new InvalidOperationException("API Key not found");
+            //var apiSecret = Environment.GetEnvironmentVariable("COINBASE_API_SECRET", EnvironmentVariableTarget.User)
+            //               ?? throw new InvalidOperationException("API Secret not found");
+            //coinbaseClient = new CoinbaseClient(apiKey, apiSecret);
 
-            coinbaseClient = new CoinbaseClient(apiKey, apiSecret);
+            // Coinbase Cloud Trading Keys
+            var apiKey = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_KEY", EnvironmentVariableTarget.User)
+                         ?? throw new InvalidOperationException("API Key not found");
+            var apiSecret = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_SECRET", EnvironmentVariableTarget.User)
+                           ?? throw new InvalidOperationException("API Secret not found");
+            coinbaseClient = new CoinbaseClient(apiKey, apiSecret, ApiKeyType.CloudTrading);
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine(".NET Framework 4.8 Coinbase.AdvancedTrade Test Application");

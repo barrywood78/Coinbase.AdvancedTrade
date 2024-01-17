@@ -7,14 +7,17 @@
     <PackageProjectUrl>https://github.com/barrywood78/Coinbase.AdvancedTrade</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<AssemblyVersion>1.1</AssemblyVersion>
-	<FileVersion>1.1</FileVersion>
-	<Version>1.1</Version>
+	<AssemblyVersion>1.2</AssemblyVersion>
+	<FileVersion>1.2</FileVersion>
+	<Version>1.2</Version>
 	<Description>An unofficial Coinbase API Wrapper</Description>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.2.1" />
+    <PackageReference Include="jose-jwt" Version="4.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
   </ItemGroup>
