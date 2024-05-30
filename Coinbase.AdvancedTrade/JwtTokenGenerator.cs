@@ -9,7 +9,7 @@ using System.IO;
 
 
 /*
- * This class is responsible for generating JSON Web Tokens (JWTs) for authenticating with the Coinbase Cloud API.
+ * This class is responsible for generating JSON Web Tokens (JWTs) for authenticating with the Coinbase Developer Platform (CDP) API.
  * It utilizes the Bouncy Castle library and the Jose library due to the following reasons:
  *
  * 1. Bouncy Castle Library:
@@ -26,17 +26,17 @@ using System.IO;
 
 
 /// <summary>
-/// Provides functionality to generate JSON Web Tokens (JWTs) for authenticating with the Coinbase Cloud API.
+/// Provides functionality to generate JSON Web Tokens (JWTs) for authenticating with the Coinbase Developer Platform (CDP) API.
 /// This utility class supports creating tokens with both REST and WebSocket service identifiers.
 /// </summary>
 public static class JwtTokenGenerator
 {
     /// <summary>
-    /// Generates a JSON Web Token (JWT) for authenticating requests with Cloud Trading API keys.
+    /// Generates a JSON Web Token (JWT) for authenticating requests with Coinbase Developer Platform (CDP) API keys.
     /// The JWT can be used in the Authorization header of the HTTP request.
     /// </summary>
-    /// <param name="key">The API key provided by Coinbase for Cloud API Trading.</param>
-    /// <param name="secret">The API secret provided by Coinbase for Cloud API Trading.</param>
+    /// <param name="key">The API key provided by Coinbase for Coinbase Developer Platform (CDP) Trading.</param>
+    /// <param name="secret">The API secret provided by Coinbase for Coinbase Developer Platform (CDP) Trading.</param>
     /// <param name="service">The service identifier for the API (e.g., 'public_websocket_api' or 'retail_rest_api_proxy').</param>
     /// <param name="method">Optional. The HTTP method being used for the request (e.g., 'GET', 'POST'). Not required for WebSocket authentication.</param>
     /// <param name="path">Optional. The path of the API endpoint being accessed. Not required for WebSocket authentication.</param>
@@ -87,7 +87,7 @@ public static class JwtTokenGenerator
                 { "iss", "coinbase-cloud" },
                 { "nbf", DateTimeOffset.UtcNow.ToUnixTimeSeconds() },
                 { "exp", DateTimeOffset.UtcNow.AddSeconds(60).ToUnixTimeSeconds() },
-                { "aud", new string[] { service } }
+                //{ "aud", new string[] { service } } - No longer required
             };
 
             if (method != null && request_path != null)

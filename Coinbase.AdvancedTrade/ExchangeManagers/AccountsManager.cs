@@ -1,5 +1,6 @@
 ﻿using Coinbase.AdvancedTrade.Interfaces;
 using Coinbase.AdvancedTrade.Models;
+using Coinbase.AdvancedTrade.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -23,9 +24,9 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             try
             {
                 var parameters = new { limit, cursor };
-                var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/accounts", ConvertToDictionary(parameters)) ?? new Dictionary<string, object>();
+                var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/accounts", UtilityHelper.ConvertToDictionary(parameters)) ?? new Dictionary<string, object>();
 
-                return DeserializeJsonElement<List<Account>>(response, "accounts");
+                return UtilityHelper.DeserializeJsonElement<List<Account>>(response, "accounts");
             }
             catch (Exception ex)
             {
@@ -47,7 +48,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             {
                 var response = await _authenticator.SendAuthenticatedRequestAsync("GET", $"/api/v3/brokerage/accounts/{accountUuid}") ?? new Dictionary<string, object>();
 
-                return DeserializeJsonElement<Account>(response, "account");
+                return UtilityHelper.DeserializeJsonElement<Account>(response, "account");
             }
             catch (Exception ex)
             {

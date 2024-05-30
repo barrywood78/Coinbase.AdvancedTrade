@@ -1,5 +1,6 @@
 ﻿using Coinbase.AdvancedTrade.Interfaces;
 using Coinbase.AdvancedTrade.Models;
+using Coinbase.AdvancedTrade.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -48,16 +49,16 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                 {
                     return new TransactionsSummary
                     {
-                        TotalVolume = ExtractDoubleValue(response, "total_volume") ?? 0.0,
-                        TotalFees = ExtractDoubleValue(response, "total_fees") ?? 0.0,
-                        AdvancedTradeOnlyVolume = ExtractDoubleValue(response, "advanced_trade_only_volume") ?? 0.0,
-                        AdvancedTradeOnlyFees = ExtractDoubleValue(response, "advanced_trade_only_fees") ?? 0.0,
-                        CoinbaseProVolume = ExtractDoubleValue(response, "coinbase_pro_volume") ?? 0.0,
-                        CoinbaseProFees = ExtractDoubleValue(response, "coinbase_pro_fees") ?? 0.0,
-                        Low = ExtractDoubleValue(response, "low") ?? 0.0,
-                        FeeTier = DeserializeJsonElement<FeeTier>(response, "fee_tier"),
-                        MarginRate = DeserializeJsonElement<MarginRate>(response, "margin_rate"),
-                        GoodsAndServicesTax = DeserializeJsonElement<GoodsAndServicesTax>(response, "goods_and_services_tax")
+                        TotalVolume = UtilityHelper.ExtractDoubleValue(response, "total_volume") ?? 0.0,
+                        TotalFees = UtilityHelper.ExtractDoubleValue(response, "total_fees") ?? 0.0,
+                        AdvancedTradeOnlyVolume = UtilityHelper.ExtractDoubleValue(response, "advanced_trade_only_volume") ?? 0.0,
+                        AdvancedTradeOnlyFees = UtilityHelper.ExtractDoubleValue(response, "advanced_trade_only_fees") ?? 0.0,
+                        CoinbaseProVolume = UtilityHelper.ExtractDoubleValue(response, "coinbase_pro_volume") ?? 0.0,
+                        CoinbaseProFees = UtilityHelper.ExtractDoubleValue(response, "coinbase_pro_fees") ?? 0.0,
+                        Low = UtilityHelper.ExtractDoubleValue(response, "low") ?? 0.0,
+                        FeeTier = UtilityHelper.DeserializeJsonElement<FeeTier>(response, "fee_tier"),
+                        MarginRate = UtilityHelper.DeserializeJsonElement<MarginRate>(response, "margin_rate"),
+                        GoodsAndServicesTax = UtilityHelper.DeserializeJsonElement<GoodsAndServicesTax>(response, "goods_and_services_tax")
                     };
                 }
             }

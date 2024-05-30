@@ -1,6 +1,7 @@
 ﻿using Coinbase.AdvancedTrade.Enums;
 using Coinbase.AdvancedTrade.Interfaces;
 using Coinbase.AdvancedTrade.Models;
+using Coinbase.AdvancedTrade.Utilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -42,9 +43,9 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             ValidateOrderStatus(orderStatus);
 
             // Use utility methods for conversion
-            string[] orderStatusStrings = EnumToStringArray(orderStatus);
-            string startDateString = FormatDateToISO8601(startDate);
-            string endDateString = FormatDateToISO8601(endDate);
+            string[] orderStatusStrings = UtilityHelper.EnumToStringArray(orderStatus);
+            string startDateString = UtilityHelper.FormatDateToISO8601(startDate);
+            string endDateString = UtilityHelper.FormatDateToISO8601(endDate);
             string orderTypeString = orderType?.ToString();
             string orderSideString = orderSide?.ToString();
 
@@ -61,10 +62,10 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
             try
             {
-                var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/orders/historical/batch", ConvertToDictionary(paramsObj))
+                var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/orders/historical/batch", UtilityHelper.ConvertToDictionary(paramsObj))
                                ?? new Dictionary<string, object>();
 
-                return DeserializeJsonElement<List<Order>>(response, "orders");
+                return UtilityHelper.DeserializeJsonElement<List<Order>>(response, "orders");
             }
             catch (Exception ex)
             {
@@ -89,8 +90,8 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             DateTime? endSequenceTimestamp = null)
         {
             // Convert DateTime to the desired ISO8601 format
-            string startSequenceTimestampString = FormatDateToISO8601(startSequenceTimestamp);
-            string endSequenceTimestampString = FormatDateToISO8601(endSequenceTimestamp);
+            string startSequenceTimestampString = UtilityHelper.FormatDateToISO8601(startSequenceTimestamp);
+            string endSequenceTimestampString = UtilityHelper.FormatDateToISO8601(endSequenceTimestamp);
 
             // Prepare request parameters using anonymous type
             var paramsObj = new
@@ -104,11 +105,11 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             try
             {
                 // Send authenticated request to the API and obtain response
-                var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/orders/historical/fills", ConvertToDictionary(paramsObj))
+                var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/orders/historical/fills", UtilityHelper.ConvertToDictionary(paramsObj))
                                ?? new Dictionary<string, object>();
 
                 // Deserialize response to obtain fills
-                return DeserializeJsonElement<List<Fill>>(response, "fills");
+                return UtilityHelper.DeserializeJsonElement<List<Fill>>(response, "fills");
             }
             catch (Exception ex)
             {
@@ -138,7 +139,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                                ?? new Dictionary<string, object>();
 
                 // Deserialize response to obtain the order details
-                return DeserializeJsonElement<Order>(response, "order");
+                return UtilityHelper.DeserializeJsonElement<Order>(response, "order");
             }
             catch (Exception ex)
             {
@@ -168,7 +169,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                                ?? new Dictionary<string, object>();
 
                 // Deserialize the response to obtain the cancel order results
-                return DeserializeJsonElement<List<CancelOrderResult>>(response, "results");
+                return UtilityHelper.DeserializeJsonElement<List<CancelOrderResult>>(response, "results");
             }
             catch (Exception ex)
             {
@@ -527,6 +528,41 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
+        public async Task<string> CreateSORLimitIOCOrderAsync(string productId, OrderSide side, string baseSize, string limitPrice)
+        {
+            // Validate input parameters
+            if (string.IsNullOrEmpty(productId))
+            {
+                throw new ArgumentException("Product ID cannot be null or empty.", nameof(productId));
+            }
+
+            if (string.IsNullOrEmpty(baseSize))
+            {
+                throw new ArgumentException("Base size cannot be null or empty.", nameof(baseSize));
+            }
+
+            if (string.IsNullOrEmpty(limitPrice))
+            {
+                throw new ArgumentException("Limit price cannot be null or empty.", nameof(limitPrice));
+            }
+
+            // Prepare the order configuration for a SOR Limit IOC order
+            var orderConfiguration = new OrderConfiguration
+            {
+                SorLimitIoc = new SorLimitIoc
+                {
+                    BaseSize = baseSize,
+                    LimitPrice = limitPrice
+                }
+            };
+
+            // Delegate the actual order creation to the general-purpose method with the prepared configuration
+            return await CreateOrderAsync(productId, side, orderConfiguration);
+        }
+
+
+
+        /// <inheritdoc/>
         public async Task<bool> EditOrderAsync(string orderId, string price = null, string size = null)
         {
             if (string.IsNullOrEmpty(orderId))
@@ -554,7 +590,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             try
             {
                 var response = await _authenticator.SendAuthenticatedRequestAsync("POST", "/api/v3/brokerage/orders/edit", null, requestBody) ?? new Dictionary<string, object>();
-                var responseObject = DeserializeDictionary<Dictionary<string, JToken>>(response);
+                var responseObject = UtilityHelper.DeserializeDictionary<Dictionary<string, JToken>>(response);
 
                 if (responseObject != null && responseObject.TryGetValue("success", out var successValue) && successValue.ToObject<bool>())
                 {
@@ -612,7 +648,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             try
             {
                 var response = await _authenticator.SendAuthenticatedRequestAsync("POST", "/api/v3/brokerage/orders/edit_preview", null, requestBody) ?? new Dictionary<string, object>();
-                var responseObject = DeserializeDictionary<Dictionary<string, JToken>>(response);
+                var responseObject = UtilityHelper.DeserializeDictionary<Dictionary<string, JToken>>(response);
 
                 // Check if there are errors
                 if (responseObject != null && responseObject.TryGetValue("errors", out var errorsValue) && errorsValue is JArray errorsArray && errorsArray.Any())

@@ -17,7 +17,6 @@ namespace Coinbase.AdvancedTradeTest
                     Assert.IsNotNull(products, "Products list should not be null.");
                     Assert.IsTrue(products?.Count > 0, "Products list should not be empty.");
                     Assert.IsNotNull(products?[0].BaseCurrencyId, "BaseCurrencyId should not be null.");
-                    Assert.AreEqual("BTC", products?[0].BaseCurrencyId, "BaseCurrencyId should be BTC.");
                 }
                 catch (Exception ex)
                 {

@@ -31,8 +31,6 @@ namespace Coinbase.AdvancedTrade
         // The API secret used for authentication.
         private readonly string _apiSecret;
 
-        private readonly ApiKeyType _apiKeyType;
-
         // Dictionary to map channel names to message processors.
         private readonly Dictionary<string, Action<string>> _messageMap = new Dictionary<string, Action<string>>();
 
@@ -43,7 +41,7 @@ namespace Coinbase.AdvancedTrade
         private bool _disposed;
 
         // Property to check if the WebSocket connection is open.
-        private bool IsWebSocketOpen => _webSocket.State == WebSocketState.Open;
+        private bool IsWebSocketOpen => _webSocket.State == System.Net.WebSockets.WebSocketState.Open;
 
         // JSON serialization options for WebSocket messages.
         private static readonly JsonSerializerSettings JsonOptions = new JsonSerializerSettings
@@ -54,10 +52,45 @@ namespace Coinbase.AdvancedTrade
             }
         };
 
-        // Property to get the current WebSocket status.
-        public WebSocketState WebSocketStatus => _webSocket.State;
+        // Tracks the subscriptions
+        private readonly HashSet<string> _subscriptions = new HashSet<string>();
 
+        /// <summary>
+        /// Gets the current status of the WebSocket connection.
+        /// </summary>
+        public Enums.WebSocketState WebSocketState
+        {
+            get
+            {
+                switch (_webSocket.State)
+                {
+                    case System.Net.WebSockets.WebSocketState.None:
+                        return Enums.WebSocketState.None;
+                    case System.Net.WebSockets.WebSocketState.Connecting:
+                        return Enums.WebSocketState.Connecting;
+                    case System.Net.WebSockets.WebSocketState.Open:
+                        return Enums.WebSocketState.Open;
+                    case System.Net.WebSockets.WebSocketState.CloseSent:
+                        return Enums.WebSocketState.CloseSent;
+                    case System.Net.WebSockets.WebSocketState.CloseReceived:
+                        return Enums.WebSocketState.CloseReceived;
+                    case System.Net.WebSockets.WebSocketState.Closed:
+                        return Enums.WebSocketState.Closed;
+                    case System.Net.WebSockets.WebSocketState.Aborted:
+                        return Enums.WebSocketState.Aborted;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
 
+        /// <summary>
+        /// Gets the current active subscriptions.
+        /// </summary>
+        public IEnumerable<string> Subscriptions => _subscriptions;
+
+        // Buffer size for receiving messages.
+        private readonly int _bufferSize;
 
         /// <summary>
         /// Initializes a new instance of the WebSocketManager class.
@@ -65,7 +98,8 @@ namespace Coinbase.AdvancedTrade
         /// <param name="webSocketUri">The URI of the WebSocket server.</param>
         /// <param name="apiKey">The API key used for authentication.</param>
         /// <param name="apiSecret">The API secret used for authentication.</param>
-        public WebSocketManager(string webSocketUri, string apiKey, string apiSecret, ApiKeyType apiKeyType = ApiKeyType.Legacy)
+        /// <param name="bufferSize">The buffer size for receiving messages, in bytes (default is 5,242,880 bytes or 5MB).</param>
+        public WebSocketManager(string webSocketUri, string apiKey, string apiSecret, int bufferSize = 5 * 1024 * 1024)
         {
             // Check for null or empty values and throw exceptions if necessary.
             if (string.IsNullOrWhiteSpace(webSocketUri)) throw new ArgumentNullException(nameof(webSocketUri));
@@ -76,7 +110,7 @@ namespace Coinbase.AdvancedTrade
             _webSocketUri = new Uri(webSocketUri);
             _apiKey = apiKey;
             _apiSecret = apiSecret;
-            _apiKeyType = apiKeyType;
+            _bufferSize = bufferSize;
 
             // Initialize the message map, mapping channel names to message processors.
             _messageMap = new Dictionary<string, Action<string>>
@@ -91,8 +125,6 @@ namespace Coinbase.AdvancedTrade
                 ["user"] = msg => ProcessMessage(msg, UserMessageReceived)
             };
         }
-
-
 
         /// <summary>
         /// Gets the string representation of a channel type.
@@ -125,10 +157,6 @@ namespace Coinbase.AdvancedTrade
             }
         }
 
-
-
-
-
         /// <summary>
         /// Establishes a WebSocket connection asynchronously.
         /// </summary>
@@ -158,8 +186,6 @@ namespace Coinbase.AdvancedTrade
             }
         }
 
-
-
         /// <summary>
         /// Closes the WebSocket connection asynchronously.
         /// </summary>
@@ -171,7 +197,7 @@ namespace Coinbase.AdvancedTrade
             try
             {
                 // Check if the WebSocket is open or in the process of closing.
-                if (IsWebSocketOpen || _webSocket.State == WebSocketState.CloseReceived)
+                if (IsWebSocketOpen || _webSocket.State == System.Net.WebSockets.WebSocketState.CloseReceived)
                 {
                     // Close the WebSocket gracefully with a normal closure status.
                     await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None).ConfigureAwait(false);
@@ -183,8 +209,6 @@ namespace Coinbase.AdvancedTrade
                 _semaphore.Release();
             }
         }
-
-
 
         /// <summary>
         /// Subscribes to a WebSocket channel asynchronously.
@@ -215,8 +239,6 @@ namespace Coinbase.AdvancedTrade
             }
         }
 
-
-
         /// <summary>
         /// Unsubscribes from a WebSocket channel asynchronously.
         /// </summary>
@@ -238,6 +260,9 @@ namespace Coinbase.AdvancedTrade
 
                 // Unsubscribe from the specified channel asynchronously.
                 await UnsubscribeFromChannelAsync(products, channelString).ConfigureAwait(false);
+
+                // Remove from the subscription set
+                _subscriptions.Remove(channelString);
             }
             finally
             {
@@ -245,8 +270,6 @@ namespace Coinbase.AdvancedTrade
                 _semaphore.Release();
             }
         }
-
-
 
         /// <summary>
         /// Subscribes to a WebSocket channel with the specified products and channel name asynchronously.
@@ -275,10 +298,10 @@ namespace Coinbase.AdvancedTrade
 
             // Send the subscription message as a text message over the WebSocket.
             await _webSocket.SendAsync(new ArraySegment<byte>(byteData), WebSocketMessageType.Text, true, CancellationToken.None).ConfigureAwait(false);
+
+            // Add to the subscription set
+            _subscriptions.Add(channelName);
         }
-
-
-
 
         /// <summary>
         /// Unsubscribes from a WebSocket channel with the specified products and channel name asynchronously.
@@ -307,10 +330,10 @@ namespace Coinbase.AdvancedTrade
 
             // Send the unsubscribe message as a text message over the WebSocket.
             await _webSocket.SendAsync(new ArraySegment<byte>(byteData), WebSocketMessageType.Text, true, CancellationToken.None).ConfigureAwait(false);
+
+            // Remove from the subscription set
+            _subscriptions.Remove(channelName);
         }
-
-
-
 
         /// <summary>
         /// Creates a subscription message object for WebSocket communication.
@@ -342,64 +365,13 @@ namespace Coinbase.AdvancedTrade
                 {"timestamp", timestamp}
             };
 
-            // Depending on the API key type, add either JWT or a signature
-            if (_apiKeyType == ApiKeyType.CloudTrading)
-            {
-                // Generate JWT for Cloud Trading keys
-                var jwt = JwtTokenGenerator.GenerateJwt(_apiKey, _apiSecret, "public_websocket_api");
-                message.Add("jwt", jwt);
-            }
-            else
-            {
-                // For Legacy keys, generate a signature
-                var productsString = products != null ? string.Join(",", products) : string.Empty;
-                var stringToSign = $"{timestamp}{channelName}{productsString}";
-                var signature = ComputeSignature(stringToSign, _apiSecret);
-                message.Add("signature", signature);
-            }
+            // Generate JWT for Coinbase Developer Platform (CDP) keys
+            var jwt = JwtTokenGenerator.GenerateJwt(_apiKey, _apiSecret, "public_websocket_api");
+            message.Add("jwt", jwt);
 
             // Return the constructed message
             return message;
         }
-
-
-
-
-
-        /// <summary>
-        /// Computes an HMACSHA256 signature for the provided data using the given secret key.
-        /// </summary>
-        /// <param name="data">The data to be signed.</param>
-        /// <param name="secret">The secret key used for HMACSHA256 signing.</param>
-        /// <returns>The hexadecimal representation of the computed signature.</returns>
-        private static string ComputeSignature(string data, string secret)
-        {
-            // Check if the data or secret is null or empty and throw exceptions if they are.
-            if (string.IsNullOrWhiteSpace(data)) throw new ArgumentNullException(nameof(data));
-            if (string.IsNullOrWhiteSpace(secret)) throw new ArgumentNullException(nameof(secret));
-
-            // Create an instance of HMACSHA256 with the secret key as the key.
-            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret)))
-            {
-                // Compute the hash of the data using HMACSHA256.
-                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
-
-                // Create a StringBuilder to store the hexadecimal representation of the hash.
-                var sb = new StringBuilder(hash.Length * 2);
-
-                // Convert each byte of the hash to a two-character lowercase hexadecimal string and append it to the StringBuilder.
-                foreach (byte b in hash)
-                {
-                    sb.Append(b.ToString("x2")); // x2 formats the byte as a two-character lowercase hexadecimal string
-                }
-
-                // Return the hexadecimal representation of the computed signature.
-                return sb.ToString();
-            }
-        }
-
-
-
 
         /// <summary>
         /// Processes a WebSocket message by deserializing it into the specified type and invoking the associated event handler.
@@ -423,8 +395,6 @@ namespace Coinbase.AdvancedTrade
             }
         }
 
-
-
         /// <summary>
         /// Processes a WebSocket message by deserializing it into a JSON element and routing it to the appropriate message processor.
         /// </summary>
@@ -447,8 +417,6 @@ namespace Coinbase.AdvancedTrade
             }
         }
 
-
-
         /// <summary>
         /// Asynchronously receives WebSocket messages and processes them.
         /// </summary>
@@ -460,7 +428,7 @@ namespace Coinbase.AdvancedTrade
                 return;
             }
 
-            var buffer = new byte[128 * 1024];
+            var buffer = new byte[_bufferSize];
             var messageSegments = new List<ArraySegment<byte>>();
 
             while (IsWebSocketOpen)
@@ -515,7 +483,6 @@ namespace Coinbase.AdvancedTrade
             }
         }
 
-
         /// <summary>
         /// Event raised when a WebSocket message is received.
         /// </summary>
@@ -561,17 +528,14 @@ namespace Coinbase.AdvancedTrade
         /// </summary>
         public event EventHandler<WebSocketMessageEventArgs<UserMessage>> UserMessageReceived;
 
-
-
         /// <summary>
         /// Disposes of the WebSocketManager instance.
         /// </summary>
         public void Dispose()
         {
-            Dispose(true); 
-            GC.SuppressFinalize(this); 
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
-
 
         /// <summary>
         /// Disposes of the WebSocketManager instance.
@@ -579,19 +543,16 @@ namespace Coinbase.AdvancedTrade
         /// <param name="disposing">True if disposing of managed resources, false if disposing of unmanaged resources only.</param>
         private void Dispose(bool disposing)
         {
-            if (!_disposed) 
+            if (!_disposed)
             {
                 if (disposing)
                 {
-                    _webSocket.Dispose(); 
+                    _webSocket.Dispose();
                 }
 
-                _disposed = true; 
+                _disposed = true;
             }
         }
-
-
-
 
         /// <summary>
         /// Finalizer for the WebSocketManager class.
@@ -600,13 +561,7 @@ namespace Coinbase.AdvancedTrade
         {
             Dispose(false); // Invokes the Dispose method to release unmanaged resources.
         }
-
-
-
-
-
     }
-
 
     /// <summary>
     /// Represents an event argument for WebSocket messages with a strongly-typed message property.
@@ -632,12 +587,7 @@ namespace Coinbase.AdvancedTrade
 
             Message = message;
         }
-
     }
-
-
-
-
 
     /// <summary>
     /// Represents an event argument for WebSocket raw message data.
@@ -664,8 +614,4 @@ namespace Coinbase.AdvancedTrade
             RawData = data;
         }
     }
-
-
-
-
 }

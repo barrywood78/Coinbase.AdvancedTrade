@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using Coinbase.AdvancedTrade.Utilities;
 
 
 namespace Coinbase.AdvancedTrade.ExchangeManagers
@@ -36,8 +37,8 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                 throw new InvalidOperationException("Authenticator is not initialized.");
             }
 
-            var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/products", ConvertToDictionary(new { product_type = productType })) ?? new Dictionary<string, object>();
-            return DeserializeJsonElement<List<Product>>(response, "products");
+            var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/products", UtilityHelper.ConvertToDictionary(new { product_type = productType })) ?? new Dictionary<string, object>();
+            return UtilityHelper.DeserializeJsonElement<List<Product>>(response, "products");
         }
 
         /// <inheritdoc/>
@@ -68,8 +69,8 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
 
             var parameters = new { start, end, granularity };
-            var response = await _authenticator.SendAuthenticatedRequestAsync("GET", $"/api/v3/brokerage/products/{productId}/candles", ConvertToDictionary(parameters)) ?? new Dictionary<string, object>();
-            return DeserializeJsonElement<List<Candle>>(response, "candles");
+            var response = await _authenticator.SendAuthenticatedRequestAsync("GET", $"/api/v3/brokerage/products/{productId}/candles", UtilityHelper.ConvertToDictionary(parameters)) ?? new Dictionary<string, object>();
+            return UtilityHelper.DeserializeJsonElement<List<Candle>>(response, "candles");
         }
 
         /// <inheritdoc/>
@@ -81,7 +82,7 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
 
             var parameters = new { limit };
-            var response = await _authenticator.SendAuthenticatedRequestAsync("GET", $"/api/v3/brokerage/products/{productId}/ticker", ConvertToDictionary(parameters)) ?? throw new InvalidOperationException("Response is null");
+            var response = await _authenticator.SendAuthenticatedRequestAsync("GET", $"/api/v3/brokerage/products/{productId}/ticker", UtilityHelper.ConvertToDictionary(parameters)) ?? throw new InvalidOperationException("Response is null");
 
             // Extract trades data from response
             if (!response.TryGetValue("trades", out object tradesObj) || !(tradesObj is JArray tradesArray))
@@ -107,8 +108,8 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
 
             var parameters = new { product_id = productId, limit };
-            var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/product_book", ConvertToDictionary(parameters)) ?? new Dictionary<string, object>();
-            return DeserializeJsonElement<ProductBook>(response, "pricebook");
+            var response = await _authenticator.SendAuthenticatedRequestAsync("GET", "/api/v3/brokerage/product_book", UtilityHelper.ConvertToDictionary(parameters)) ?? new Dictionary<string, object>();
+            return UtilityHelper.DeserializeJsonElement<ProductBook>(response, "pricebook");
         }
 
         /// <inheritdoc/>

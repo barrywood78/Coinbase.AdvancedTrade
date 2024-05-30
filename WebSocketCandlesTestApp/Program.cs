@@ -14,7 +14,7 @@ var apiKey = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_KEY"
              ?? throw new InvalidOperationException("API Key not found");
 var apiSecret = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_SECRET", EnvironmentVariableTarget.User)
                ?? throw new InvalidOperationException("API Secret not found");
-var coinbaseClient = new CoinbaseClient(apiKey, apiSecret, ApiKeyType.CloudTrading);
+var coinbaseClient = new CoinbaseClient(apiKey, apiSecret);
 
 WebSocketManager? webSocketManager = coinbaseClient.WebSocket;
 
@@ -41,7 +41,7 @@ try
     await webSocketManager.ConnectAsync();
 
     Console.WriteLine("Subscribing to candles...");
-    await webSocketManager.SubscribeAsync(new[] { "BTC-USDC" },ChannelType.Candles);
+    await webSocketManager.SubscribeAsync(new[] { "BTC-USDC" }, ChannelType.Candles);
 
     Console.WriteLine("Press any key to unsubscribe and exit.");
     Console.ReadKey();
