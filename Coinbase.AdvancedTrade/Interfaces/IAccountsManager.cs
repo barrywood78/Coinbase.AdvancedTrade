@@ -4,6 +4,9 @@ using Coinbase.AdvancedTrade.Models;
 
 namespace Coinbase.AdvancedTrade.Interfaces
 {
+    /// <summary>
+    /// Provides methods to manage accounts on the Coinbase Advanced Trade API.
+    /// </summary>
     public interface IAccountsManager
     {
         /// <summary>

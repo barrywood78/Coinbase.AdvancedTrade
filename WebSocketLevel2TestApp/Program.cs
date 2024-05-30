@@ -1,21 +1,18 @@
 ﻿using Coinbase.AdvancedTrade;
 using Coinbase.AdvancedTrade.Enums;
+using Org.BouncyCastle.Utilities;
 
 bool _isCleanupDone = false;
 
-// Coinbase Legacy API Keys
-//var apiKey = Environment.GetEnvironmentVariable("COINBASE_API_KEY", EnvironmentVariableTarget.User)
-//             ?? throw new InvalidOperationException("API Key not found");
-//var apiSecret = Environment.GetEnvironmentVariable("COINBASE_API_SECRET", EnvironmentVariableTarget.User)
-//               ?? throw new InvalidOperationException("API Secret not found");
-//var coinbaseClient = new CoinbaseClient(apiKey, apiSecret);
-
-// Coinbase Cloud Trading Keys
+// Coinbase Developer Platform Keys
 var apiKey = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_KEY", EnvironmentVariableTarget.User)
              ?? throw new InvalidOperationException("API Key not found");
 var apiSecret = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_SECRET", EnvironmentVariableTarget.User)
                ?? throw new InvalidOperationException("API Secret not found");
-var coinbaseClient = new CoinbaseClient(apiKey, apiSecret, ApiKeyType.CloudTrading);
+
+var buffer10MegaBytes = 10 * 1024 * 1024; // 10 MB
+
+var coinbaseClient = new CoinbaseClient(apiKey, apiSecret, buffer10MegaBytes); 
 
 WebSocketManager? webSocketManager = coinbaseClient.WebSocket;
 

@@ -5,8 +5,6 @@ VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coinbase.AdvancedTrade", "Coinbase.AdvancedTrade\Coinbase.AdvancedTrade.csproj", "{32797FEE-6A76-4787-B99E-EBF7E9E600A1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketCandlesTestApp", "WebSocketTestApp\WebSocketCandlesTestApp.csproj", "{D5F16F96-48CE-458E-A1C6-8BE49A4C5B05}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketHeartbeatTestApp", "WebSocketHeartbeatTestApp\WebSocketHeartbeatTestApp.csproj", "{EE7B5B64-BBCD-4146-8D0F-376617721789}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketMarketTradesTestApp", "WebSocketMarketTradesTestApp\WebSocketMarketTradesTestApp.csproj", "{CE222C8F-B1A2-4F0A-A36F-5A5C454C38D7}"
@@ -22,10 +20,17 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketUserTestApp", "WebSocketUserTestApp\WebSocketUserTestApp.csproj", "{3648ED4D-CD32-44ED-B5B3-482A8AE54287}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5B03447D-8DFB-44A0-8D96-C2F56DFC9167}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Framework.4.8.TestApp", "Framework.4.8.TestApp\Framework.4.8.TestApp.csproj", "{51F3D673-00A5-4A0C-937E-6F00B74377D2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Coinbase.AdvancedTrade.IntegrationTests", "Coinbase.AdvancedTrade.IntegrationTests\Coinbase.AdvancedTrade.IntegrationTests.csproj", "{27BD417D-8326-4415-B57B-7A9CA81E9E8C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketReconnectionTestApp", "WebSocketReconnectionTestApp\WebSocketReconnectionTestApp.csproj", "{DFA79363-D84D-4C5B-BCE3-904911EEC6C3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebSocketCandlesTestApp", "WebSocketCandlesTestApp\WebSocketCandlesTestApp.csproj", "{6B744326-0EE4-441F-96BB-D07F1DBE35CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +42,6 @@ Global
 		{32797FEE-6A76-4787-B99E-EBF7E9E600A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{32797FEE-6A76-4787-B99E-EBF7E9E600A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32797FEE-6A76-4787-B99E-EBF7E9E600A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5F16F96-48CE-458E-A1C6-8BE49A4C5B05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5F16F96-48CE-458E-A1C6-8BE49A4C5B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5F16F96-48CE-458E-A1C6-8BE49A4C5B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5F16F96-48CE-458E-A1C6-8BE49A4C5B05}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EE7B5B64-BBCD-4146-8D0F-376617721789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EE7B5B64-BBCD-4146-8D0F-376617721789}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE7B5B64-BBCD-4146-8D0F-376617721789}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -77,6 +78,14 @@ Global
 		{27BD417D-8326-4415-B57B-7A9CA81E9E8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27BD417D-8326-4415-B57B-7A9CA81E9E8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27BD417D-8326-4415-B57B-7A9CA81E9E8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DFA79363-D84D-4C5B-BCE3-904911EEC6C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFA79363-D84D-4C5B-BCE3-904911EEC6C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFA79363-D84D-4C5B-BCE3-904911EEC6C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFA79363-D84D-4C5B-BCE3-904911EEC6C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B744326-0EE4-441F-96BB-D07F1DBE35CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B744326-0EE4-441F-96BB-D07F1DBE35CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B744326-0EE4-441F-96BB-D07F1DBE35CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B744326-0EE4-441F-96BB-D07F1DBE35CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

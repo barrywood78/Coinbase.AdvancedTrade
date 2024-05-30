@@ -25,7 +25,7 @@ namespace Coinbase.AdvancedTradeTest
             await ExecuteRateLimitedTest(async () =>
             {
                 Assert.IsNotNull(_coinbaseClient, "Coinbase client should not be null.");
-                var orderNumber = await _coinbaseClient!.Orders.CreateMarketOrderAsync("BTC-USDC", OrderSide.SELL, "0.00002111");
+                var orderNumber = await _coinbaseClient!.Orders.CreateMarketOrderAsync("BTC-USDC", OrderSide.SELL, "0.0002");
                 Assert.IsNotNull(orderNumber, "Order Number should not be null.");
             });
         }
@@ -51,7 +51,7 @@ namespace Coinbase.AdvancedTradeTest
             await ExecuteRateLimitedTest(async () =>
             {
                 Assert.IsNotNull(_coinbaseClient, "Coinbase client should not be null.");
-                var orderNumber = await _coinbaseClient!.Orders.CreateLimitOrderGTCAsync("BTC-USDC", OrderSide.SELL, "0.000035", "50000", true);
+                var orderNumber = await _coinbaseClient!.Orders.CreateLimitOrderGTCAsync("BTC-USDC", OrderSide.SELL, "0.000035", "70000", true);
                 Assert.IsNotNull(orderNumber, "Order number should not be null.");
             });
         }
@@ -78,7 +78,7 @@ namespace Coinbase.AdvancedTradeTest
             await ExecuteRateLimitedTest(async () =>
             {
                 Assert.IsNotNull(_coinbaseClient, "Coinbase client should not be null.");
-                var orderNumber = await _coinbaseClient!.Orders.CreateLimitOrderGTDAsync("BTC-USDC", OrderSide.SELL, "0.000035", "50000", DateTime.UtcNow.AddDays(1), true);
+                var orderNumber = await _coinbaseClient!.Orders.CreateLimitOrderGTDAsync("BTC-USDC", OrderSide.SELL, "0.000035", "70000", DateTime.UtcNow.AddDays(1), true);
                 Assert.IsNotNull(orderNumber, "Order number should not be null.");
             });
         }
@@ -92,13 +92,13 @@ namespace Coinbase.AdvancedTradeTest
             await ExecuteRateLimitedTest(async () =>
             {
                 Assert.IsNotNull(_coinbaseClient, "Coinbase client should not be null.");
-                var orderNumber = await _coinbaseClient!.Orders.CreateStopLimitOrderGTCAsync("BTC-USDC", OrderSide.BUY, "0.0001", "48000.00", "47000.00");
+                var orderNumber = await _coinbaseClient!.Orders.CreateStopLimitOrderGTCAsync("BTC-USDC", OrderSide.BUY, "0.0001", "69000.00", "68700.00");
                 Assert.IsNotNull(orderNumber, "Order number should not be null.");
             });
         }
 
         [TestMethod]
-        [Description("Test to verify that CreateStopLimitOrderGTCSel creates a stop-limit sell order with GTC for BTC-USDC.")]
+        [Description("Test to verify that CreateStopLimitOrderGTCSell creates a stop-limit sell order with GTC for BTC-USDC.")]
         public async Task Test_Orders_CreateStopLimitOrderGTCSellAsync()
         {
             await ExecuteRateLimitedTest(async () =>
@@ -113,14 +113,14 @@ namespace Coinbase.AdvancedTradeTest
 
 
         [TestMethod]
-        [Description("Test to verify that CreateStopLimitOrderGTDBu creates a limit order for BTC-USDC.")]
+        [Description("Test to verify that CreateStopLimitOrderGTDBuy creates a limit order for BTC-USDC.")]
         public async Task Test_Orders_CreateStopLimitOrderGTDBuyAsync()
         {
             await ExecuteRateLimitedTest(async () =>
             {
                 Assert.IsNotNull(_coinbaseClient, "Coinbase client should not be null.");
                 var orderNumber = await _coinbaseClient!.Orders.CreateStopLimitOrderGTDAsync(
-                    "BTC-USDC", OrderSide.BUY, "0.0001", "48000.00", "47000.00", DateTime.UtcNow.AddDays(1));
+                    "BTC-USDC", OrderSide.BUY, "0.0001", "69000.00", "68700.00", DateTime.UtcNow.AddDays(1));
                 Assert.IsNotNull(orderNumber, "Order number should not be null.");
             });
         }
@@ -137,6 +137,31 @@ namespace Coinbase.AdvancedTradeTest
                 Assert.IsNotNull(orderNumber, "Order number should not be null.");
             });
         }
+
+        [TestMethod]
+        [Description("Test to verify that CreateSORLimitIOCOrderBuyAsync creates a SOR limit IOC Buy order for BTC-USDC.")]
+        public async Task Test_Orders_CreateSORLimitIOCOrderBuyAsync()
+        {
+            await ExecuteRateLimitedTest(async () =>
+            {
+                Assert.IsNotNull(_coinbaseClient, "Coinbase client should not be null.");
+                var orderNumber = await _coinbaseClient!.Orders.CreateSORLimitIOCOrderAsync("BTC-USDC", OrderSide.BUY, "0.0001", "65000.00");
+                Assert.IsNotNull(orderNumber, "Order number should not be null.");
+            });
+        }
+
+        [TestMethod]
+        [Description("Test to verify that CreateSORLimitIOCOrderSellAsync creates a SOR limit IOC Sell order for BTC-USDC.")]
+        public async Task Test_Orders_CreateSORLimitIOCOrderSellAsync()
+        {
+            await ExecuteRateLimitedTest(async () =>
+            {
+                Assert.IsNotNull(_coinbaseClient, "Coinbase client should not be null.");
+                var orderNumber = await _coinbaseClient!.Orders.CreateSORLimitIOCOrderAsync("BTC-USDC", OrderSide.SELL, "0.000035", "70000");
+                Assert.IsNotNull(orderNumber, "Order number should not be null.");
+            });
+        }
+
 
 
 

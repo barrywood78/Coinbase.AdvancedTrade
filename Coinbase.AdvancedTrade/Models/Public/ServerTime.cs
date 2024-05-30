@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Coinbase.AdvancedTrade.Models
+namespace Coinbase.AdvancedTrade.Models.Public
 {
     /// <summary>
     /// Represents the server time details.

@@ -73,7 +73,7 @@ namespace Coinbase.AdvancedTradeTest
         {
             await ExecuteRateLimitedTest(async () =>
             {
-                string[] testOrderIds = { "6aa5cd51-cb59-4405-8ddc-1152571192c6" };
+                string[] testOrderIds = { "b38ad5a6-6fd5-44db-ad36-196ac426de1a" };
                 var result = await _coinbaseClient!.Orders.CancelOrdersAsync(testOrderIds);
 
                 Assert.IsNotNull(result, "Result should not be null.");
@@ -90,9 +90,9 @@ namespace Coinbase.AdvancedTradeTest
         {
             await ExecuteRateLimitedTest(async () =>
             {
-                string existingOrderId = "548ada7b-c157-4e1a-b7db-fd6bf7081ba4";
+                string existingOrderId = "57f52fa4-7c3e-4a1b-ac67-a3bce72f4086";
 
-                string newPrice = "40200.00";
+                string newPrice = "12000.00";
                 string? newSize = "0.000035";
 
                 // Attempt to edit the order
@@ -110,9 +110,9 @@ namespace Coinbase.AdvancedTradeTest
         {
             await ExecuteRateLimitedTest(async () =>
             {
-                string existingOrderId = "548ada7b-c157-4e1a-b7db-fd6bf7081ba4";
+                string existingOrderId = "57f52fa4-7c3e-4a1b-ac67-a3bce72f4086";
 
-                string newPrice = "40200.00";
+                string newPrice = "12000.00";
                 string? newSize = "0.000035";
 
                 var result = await _coinbaseClient!.Orders.EditOrderPreviewAsync(existingOrderId, newPrice, newSize);

@@ -114,6 +114,15 @@ namespace Coinbase.AdvancedTrade.Interfaces
         /// <returns>A task representing the operation. The task result contains the ID of the created order, or null if creation failed.</returns>
         Task<string> CreateStopLimitOrderGTDAsync(string productId, OrderSide side, string baseSize, string limitPrice, string stopPrice, DateTime endTime);
 
+        /// <summary>
+        /// Asynchronously creates a limit IOC order with Smart Order Routing (SOR).
+        /// </summary>
+        /// <param name="productId">Product ID for which the order is being placed.</param>
+        /// <param name="side">Side of the order (buy/sell).</param>
+        /// <param name="baseSize">Base size of the order.</param>
+        /// <param name="limitPrice">Limit price for the order.</param>
+        /// <returns>A task representing the operation. The task result contains the ID of the created order, or null if creation failed.</returns>
+        Task<string> CreateSORLimitIOCOrderAsync(string productId, OrderSide side, string baseSize, string limitPrice);
 
         /// <summary>
         /// Asynchronously edits an existing order with a specified new size or new price.
@@ -137,7 +146,6 @@ namespace Coinbase.AdvancedTrade.Interfaces
         /// <param name="size">New size for the order.</param>
         /// <returns>A task representing the operation, returning true if the preview was successful, false otherwise.</returns>
         Task<EditOrderPreviewResult> EditOrderPreviewAsync(string orderId, string price, string size);
-
 
     }
 }
