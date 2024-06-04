@@ -31,6 +31,8 @@ namespace Coinbase.AdvancedTrade
         // The API secret used for authentication.
         private readonly string _apiSecret;
 
+        private readonly ApiKeyType _apiKeyType;
+
         // Dictionary to map channel names to message processors.
         private readonly Dictionary<string, Action<string>> _messageMap = new Dictionary<string, Action<string>>();
 
@@ -99,7 +101,8 @@ namespace Coinbase.AdvancedTrade
         /// <param name="apiKey">The API key used for authentication.</param>
         /// <param name="apiSecret">The API secret used for authentication.</param>
         /// <param name="bufferSize">The buffer size for receiving messages, in bytes (default is 5,242,880 bytes or 5MB).</param>
-        public WebSocketManager(string webSocketUri, string apiKey, string apiSecret, int bufferSize = 5 * 1024 * 1024)
+        /// <param name="apiKeyType">Specifies the type of API key used. This can be either a Legacy key (Depricated) or a Coinbase Developer Platform (CDP) key.</param>
+        public WebSocketManager(string webSocketUri, string apiKey, string apiSecret, int bufferSize = 5 * 1024 * 1024, ApiKeyType apiKeyType = ApiKeyType.CoinbaseDeveloperPlatform)
         {
             // Check for null or empty values and throw exceptions if necessary.
             if (string.IsNullOrWhiteSpace(webSocketUri)) throw new ArgumentNullException(nameof(webSocketUri));
@@ -111,6 +114,7 @@ namespace Coinbase.AdvancedTrade
             _apiKey = apiKey;
             _apiSecret = apiSecret;
             _bufferSize = bufferSize;
+            _apiKeyType = apiKeyType;
 
             // Initialize the message map, mapping channel names to message processors.
             _messageMap = new Dictionary<string, Action<string>>
@@ -365,9 +369,21 @@ namespace Coinbase.AdvancedTrade
                 {"timestamp", timestamp}
             };
 
-            // Generate JWT for Coinbase Developer Platform (CDP) keys
-            var jwt = JwtTokenGenerator.GenerateJwt(_apiKey, _apiSecret, "public_websocket_api");
-            message.Add("jwt", jwt);
+            // Depending on the API key type, add either JWT or a signature
+            if (_apiKeyType == ApiKeyType.CoinbaseDeveloperPlatform)
+            {
+                // Generate JWT for Cloud Trading keys
+                var jwt = JwtTokenGenerator.GenerateJwt(_apiKey, _apiSecret, "public_websocket_api");
+                message.Add("jwt", jwt);
+            }
+            else
+            {
+                // For Legacy keys, generate a signature
+                var productsString = products != null ? string.Join(",", products) : string.Empty;
+                var stringToSign = $"{timestamp}{channelName}{productsString}";
+                var signature = ComputeSignature(stringToSign, _apiSecret);
+                message.Add("signature", signature);
+            }
 
             // Return the constructed message
             return message;
@@ -482,6 +498,42 @@ namespace Coinbase.AdvancedTrade
                 }
             }
         }
+
+
+
+        /// <summary>
+        /// Computes an HMACSHA256 signature for the provided data using the given secret key.
+        /// </summary>
+        /// <param name="data">The data to be signed.</param>
+        /// <param name="secret">The secret key used for HMACSHA256 signing.</param>
+        /// <returns>The hexadecimal representation of the computed signature.</returns>
+        private static string ComputeSignature(string data, string secret)
+        {
+            // Check if the data or secret is null or empty and throw exceptions if they are.
+            if (string.IsNullOrWhiteSpace(data)) throw new ArgumentNullException(nameof(data));
+            if (string.IsNullOrWhiteSpace(secret)) throw new ArgumentNullException(nameof(secret));
+
+            // Create an instance of HMACSHA256 with the secret key as the key.
+            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret)))
+            {
+                // Compute the hash of the data using HMACSHA256.
+                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
+
+                // Create a StringBuilder to store the hexadecimal representation of the hash.
+                var sb = new StringBuilder(hash.Length * 2);
+
+                // Convert each byte of the hash to a two-character lowercase hexadecimal string and append it to the StringBuilder.
+                foreach (byte b in hash)
+                {
+                    sb.Append(b.ToString("x2")); // x2 formats the byte as a two-character lowercase hexadecimal string
+                }
+
+                // Return the hexadecimal representation of the computed signature.
+                return sb.ToString();
+            }
+        }
+
+
 
         /// <summary>
         /// Event raised when a WebSocket message is received.

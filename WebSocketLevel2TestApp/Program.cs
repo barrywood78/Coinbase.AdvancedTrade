@@ -10,9 +10,18 @@ var apiKey = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_KEY"
 var apiSecret = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_SECRET", EnvironmentVariableTarget.User)
                ?? throw new InvalidOperationException("API Secret not found");
 
+
+// Coinbase Legacy Keys
+//var apiKey = Environment.GetEnvironmentVariable("COINBASE_LEGACY_API_KEY", EnvironmentVariableTarget.User)
+//         ?? throw new InvalidOperationException("API Key not found");
+//var apiSecret = Environment.GetEnvironmentVariable("COINBASE_LEGACY_API_SECRET", EnvironmentVariableTarget.User)
+//           ?? throw new InvalidOperationException("API Secret not found");
+
+
 var buffer10MegaBytes = 10 * 1024 * 1024; // 10 MB
 
-var coinbaseClient = new CoinbaseClient(apiKey, apiSecret, buffer10MegaBytes); 
+var coinbaseClient = new CoinbaseClient(apiKey, apiSecret, buffer10MegaBytes);
+//var coinbaseClient = new CoinbaseClient(apiKey: apiKey, apiSecret: apiSecret, websocketBufferSize: buffer10MegaBytes, apiKeyType: ApiKeyType.Legacy);
 
 WebSocketManager? webSocketManager = coinbaseClient.WebSocket;
 

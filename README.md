@@ -1,6 +1,8 @@
 # Coinbase API Wrapper for Advanced Trade
 
-This project provides a C# wrapper for the [Coinbase Advanced Trade API](https://docs.cloud.coinbase.com/advanced-trade-api), facilitating interactions with various advanced trading functionalities on Coinbase. The wrapper now supports only the new Coinbase Developer Platform (CDP) Keys, which utilize JWT for authentication. The legacy API keys option has been removed following Coinbase's update effective after an extended timeline, effective June 10, 2024. For more details on Coinbase Developer Platform (CDP) Keys, see [Coinbase's documentation](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-auth#cloud-api-trading-keys).
+This project provides a C# wrapper for the [Coinbase Advanced Trade API](https://docs.cloud.coinbase.com/advanced-trade-api), facilitating interactions with various advanced trading functionalities on Coinbase. 
+
+The wrapper supports both Coinbase Developer Platform (CDP) Keys and Legacy keys. The new Coinbase Developer Platform (CDP) Keys utilize JWT for authentication. The legacy API keys option has been restored but is deprecated and will be removed in a future release following Coinbase's update and the removal of the ability to create and edit legacy API keys effective June 10, 2024. However, Coinbase will continue to allow existing legacy keys to work for some time. For more details on Coinbase Developer Platform (CDP) Keys, see [Coinbase's documentation](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-auth#cloud-api-trading-keys).
 
 For Coinbase Developer Platform (CDP) Keys, the `key_name` and `key_secret` are expected to follow this structure as per Coinbase:
 
@@ -96,6 +98,10 @@ The `Coinbase API Wrapper` is accompanied by a suite of tests, ensuring its reli
 - **Test Coverage**: Tests cover key functionalities including (but not limited to) authentication, order management, and WebSocket communication.
 
 # Changelog
+
+## v1.3.1 - 2024-JUN-04
+- **Reverted CoinbaseClient Constructor to Include Legacy API Key Type**: The `CoinbaseClient` constructor again includes the `ApiKeyType` of `Legacy`, but `CoinbaseDeveloperPlatform` is now the default. **This may be a breaking change and can be fixed by supplying the constuctor with an ApiKeyType = Legacy**.
+
 
 ## v1.3 - 2024-MAY-30
 - **Removed Legacy API Keys**: The wrapper now only supports Coinbase Developer Platform (CDP) API keys due to Coinbase removing legacy keys after an extended timeline, effective June 10, 2024. **This is a breaking change**
