@@ -12,41 +12,52 @@ namespace Coinbase.AdvancedTrade
 {
     /// <summary>
     /// Represents an authenticator for Coinbase API requests.
-    /// This class is responsible for generating appropriate JWT headers and ensuring authenticated communication with the Coinbase API.
+    /// This class is responsible for generating appropriate headers and ensuring authenticated communication with the Coinbase API.
     /// </summary>
     public sealed class CoinbaseAuthenticator
     {
         private readonly RestClient _client;
-
-        private ApiKeyType apiKeyType = ApiKeyType.CoinbaseDeveloperPlatform; // Default to CoinbaseDeveloperPlatform (CDP)
+        private readonly string _apiKey;
+        private readonly string _apiSecret;
+        private readonly string _oAuth2AccessToken;
+        private readonly bool _useOAuth;
+        private ApiKeyType _apiKeyType;
+        private const string _apiUrl = "https://api.coinbase.com";
 
         /// <summary>
         /// Gets the API key used for Coinbase authentication.
         /// </summary>
-        private string Key { get; }
+        private string Key => _apiKey;
 
         /// <summary>
         /// Gets the API secret used for Coinbase authentication.
         /// </summary>
-        private string Secret { get; }
+        private string Secret => _apiSecret;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CoinbaseAuthenticator"/> class.
+        /// Initializes a new instance of the <see cref="CoinbaseAuthenticator"/> class using API key and secret.
         /// </summary>
         /// <param name="apiKey">The API key for Coinbase authentication.</param>
         /// <param name="apiSecret">The API secret for Coinbase authentication.</param>
-        /// <param name="apiKeyType">The type of API key, CoinbaseDeveloperPlatform or Legacy(depricated).</param>
-        /// <exception cref="ArgumentNullException">Thrown when either <paramref name="apiKey"/> or <paramref name="apiSecret"/> is null.</exception>
+        /// <param name="apiKeyType">The type of API key, CoinbaseDeveloperPlatform or Legacy (deprecated).</param>
         public CoinbaseAuthenticator(string apiKey, string apiSecret, ApiKeyType apiKeyType = ApiKeyType.CoinbaseDeveloperPlatform)
         {
-            this.apiKeyType = apiKeyType;
+            _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey), "API key cannot be null.");
+            _apiSecret = apiSecret ?? throw new ArgumentNullException(nameof(apiSecret), "API secret cannot be null.");
+            _apiKeyType = apiKeyType;
+            _client = new RestClient(_apiUrl);
+            _useOAuth = false;
+        }
 
-            // Validate input arguments
-            Key = apiKey ?? throw new ArgumentNullException(nameof(apiKey), "API key cannot be null.");
-            Secret = apiSecret ?? throw new ArgumentNullException(nameof(apiSecret), "API secret cannot be null.");
-
-            // Initialize the REST client with the base Coinbase API URL
-            _client = new RestClient("https://api.coinbase.com");
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CoinbaseAuthenticator"/> class using OAuth2 access token.
+        /// </summary>
+        /// <param name="oAuth2AccessToken">The OAuth2 access token for Coinbase authentication.</param>
+        public CoinbaseAuthenticator(string oAuth2AccessToken)
+        {
+            _oAuth2AccessToken = oAuth2AccessToken ?? throw new ArgumentNullException(nameof(oAuth2AccessToken), "OAuth2 access token cannot be null.");
+            _client = new RestClient(_apiUrl);
+            _useOAuth = true;
         }
 
         /// <summary>
@@ -72,25 +83,33 @@ namespace Coinbase.AdvancedTrade
             }
 
             // Generate headers required for the authenticated request
-            var headers = CreateHeaders(method, path, bodyObj);
+            var headers = _useOAuth ? CreateOAuth2Headers() : CreateHeaders(method, path, bodyObj);
 
             // Execute the request and return the result
             return await ExecuteRequestAsync(method, path, bodyObj, headers, queryParams);
         }
 
+        /// <summary>
+        /// Generates headers for OAuth2 authentication.
+        /// </summary>
+        /// <returns>A dictionary of headers with the Authorization header containing the OAuth2 access token.</returns>
+        private Dictionary<string, string> CreateOAuth2Headers()
+        {
+            return new Dictionary<string, string>
+            {
+                { "Authorization", $"Bearer {_oAuth2AccessToken}" }
+            };
+        }
 
         /// <summary>
-        /// Generates headers for Coinbase Developer Platform (CDP) API key authentication using JWT (JSON Web Token).
-        /// This method creates a JWT token using the 'GenerateJwt' method, which includes
-        /// various claims such as issuer, subject, audience, and the request details (method and path).
-        /// The generated JWT is then included in the Authorization header as a Bearer token.
+        /// Generates headers for API key/secret authentication using JWT (JSON Web Token).
         /// </summary>
         /// <param name="method">The HTTP method being used for the request (e.g., 'GET', 'POST').</param>
         /// <param name="path">The path of the API endpoint being accessed.</param>
         /// <returns>A dictionary of headers with the Authorization header containing the JWT for authenticating the request using Coinbase Developer Platform (CDP) API keys.</returns>
         private Dictionary<string, string> CreateJwtHeaders(string method, string path)
         {
-            string jwtToken = JwtTokenGenerator.GenerateJwt(Key, Secret, "retail_rest_api_proxy", method, path);
+            string jwtToken = JwtTokenGenerator.GenerateJwt(_apiKey, _apiSecret, "retail_rest_api_proxy", method, path);
             return new Dictionary<string, string>
             {
                 { "Authorization", $"Bearer {jwtToken}" }
@@ -167,9 +186,6 @@ namespace Coinbase.AdvancedTrade
             return JsonConvert.DeserializeObject<Dictionary<string, object>>(response.Content);
         }
 
-
-
-
         /// <summary>
         /// Creates headers for a request, with values appropriate to the type of API key being used.
         /// For legacy keys, it delegates to CreateLegacyHeaders method to include a signature based on the HMACSHA256 algorithm.
@@ -183,7 +199,7 @@ namespace Coinbase.AdvancedTrade
         {
             try
             {
-                if (apiKeyType == ApiKeyType.CoinbaseDeveloperPlatform)
+                if (_apiKeyType == ApiKeyType.CoinbaseDeveloperPlatform)
                 {
                     // For JWT-based Cloud Trading keys, generate JWT headers
                     return CreateJwtHeaders(method, path);
@@ -199,7 +215,6 @@ namespace Coinbase.AdvancedTrade
                 throw;
             }
         }
-
 
         /// <summary>
         /// Generates headers for legacy API key authentication.
@@ -229,7 +244,6 @@ namespace Coinbase.AdvancedTrade
             };
         }
 
-
         /// <summary>
         /// Generates a signature using HMACSHA256 for the provided message.
         /// </summary>
@@ -251,7 +265,6 @@ namespace Coinbase.AdvancedTrade
                 return queryStringIndex != -1 ? msg.Substring(0, queryStringIndex) : msg;
             }
 
-
             // Local function to compute the HMACSHA256 signature
             string ComputeHmacSignature(string msg)
             {
@@ -262,14 +275,5 @@ namespace Coinbase.AdvancedTrade
                 }
             }
         }
-
-
-
-
-
-
-
-
-
     }
 }

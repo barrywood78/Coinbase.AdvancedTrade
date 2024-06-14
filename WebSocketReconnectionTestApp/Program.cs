@@ -11,7 +11,7 @@ class Program
     private static WebSocketManager? webSocketManager = null;
     private static string? apiKey;
     private static string? apiSecret;
-    private static ApiKeyType apiKeyType;
+    private static ApiKeyType _apiKeyType;
 
     static async Task Main(string[] args)
     {
@@ -20,7 +20,7 @@ class Program
                  ?? throw new InvalidOperationException("API Key not found");
         apiSecret = Environment.GetEnvironmentVariable("COINBASE_CLOUD_TRADING_API_SECRET", EnvironmentVariableTarget.User)
                    ?? throw new InvalidOperationException("API Secret not found");
-        var apiKeyType = ApiKeyType.CoinbaseDeveloperPlatform;
+        _apiKeyType = ApiKeyType.CoinbaseDeveloperPlatform;
 
 
         // Coinbase Legacy Keys
@@ -32,7 +32,7 @@ class Program
 
 
         // Initialize the Coinbase client and WebSocket manager
-        coinbaseClient = new CoinbaseClient(apiKey: apiKey, apiSecret: apiSecret, apiKeyType: apiKeyType);
+        coinbaseClient = new CoinbaseClient(apiKey: apiKey, apiSecret: apiSecret, apiKeyType: _apiKeyType);
 
         webSocketManager = coinbaseClient.WebSocket;
 
@@ -199,8 +199,8 @@ class Program
         webSocketManager!.Dispose();
 
         // Create a new WebSocketManager instance using the Coinbase client
-        webSocketManager = new CoinbaseClient(apiKey: apiKey, apiSecret: apiSecret, apiKeyType: apiKeyType).WebSocket;
-    
+        webSocketManager = new CoinbaseClient(apiKey: apiKey, apiSecret: apiSecret, apiKeyType: _apiKeyType).WebSocket;
+
         // Re-subscribe to WebSocket events with the new WebSocketManager instance
         SubscribeToWebSocketEvents(webSocketManager);
 

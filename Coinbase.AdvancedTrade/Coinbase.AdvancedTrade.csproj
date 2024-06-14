@@ -7,9 +7,9 @@
     <PackageProjectUrl>https://github.com/barrywood78/Coinbase.AdvancedTrade</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<AssemblyVersion>1.3.1</AssemblyVersion>
-	<FileVersion>1.3.1</FileVersion>
-	<Version>1.3.1</Version>
+	<AssemblyVersion>1.4</AssemblyVersion>
+	<FileVersion>1.4</FileVersion>
+	<Version>1.4</Version>
 	<Description>An unofficial Coinbase API Wrapper</Description>
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
 
