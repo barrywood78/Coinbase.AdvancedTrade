@@ -2,7 +2,7 @@
 
 This project provides a C# wrapper for the [Coinbase Advanced Trade API](https://docs.cloud.coinbase.com/advanced-trade-api), facilitating interactions with various advanced trading functionalities on Coinbase. 
 
-The wrapper supports both Coinbase Developer Platform (CDP) Keys and Legacy keys. The new Coinbase Developer Platform (CDP) Keys utilize JWT for authentication. The legacy API keys option has been restored but is deprecated and will be removed in a future release following Coinbase's update and the removal of the ability to create and edit legacy API keys effective June 10, 2024. However, Coinbase will continue to allow existing legacy keys to work for some time. For more details on Coinbase Developer Platform (CDP) Keys, see [Coinbase's documentation](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-auth#cloud-api-trading-keys).
+The wrapper supports both Coinbase Developer Platform (CDP) Keys, Legacy keys, and now OAuth2 access tokens. The new Coinbase Developer Platform (CDP) Keys utilize JWT for authentication. The legacy API keys option has been restored but is deprecated and will be removed in a future release following Coinbase's update and the removal of the ability to create and edit legacy API keys effective June 10, 2024. However, Coinbase will continue to allow existing legacy keys to work for some time. For more details on Coinbase Developer Platform (CDP) Keys, see [Coinbase's documentation](https://docs.cloud.coinbase.com/advanced-trade-api/docs/rest-api-auth#cloud-api-trading-keys).
 
 For Coinbase Developer Platform (CDP) Keys, the `key_name` and `key_secret` are expected to follow this structure as per Coinbase:
 
@@ -34,6 +34,11 @@ Collection of models capturing the essence of various entities and data structur
 Your gateway to the vast functionalities of the Coinbase API, supporting the new Coinbase Developer Platform (CDP) Keys.
 - **Constructor**: Initializes managers for accounts, products, orders, fees, and WebSocket connections using the provided API credentials. It also includes an optional parameter to specify the WebSocket buffer size, with a default value of 5 MB.
 
+### `CoinbaseOauth2Client`
+A new client that allows interaction with the Coinbase API using OAuth2 access tokens.
+- **Constructor**: Initializes managers for accounts, products, orders, and fees using the provided OAuth2 access token.
+- **Note**: OAuth2 does not support WebSocket connections.
+
 ### `CoinbasePublicClient`
 Access public API endpoints without the need for authentication.
 - **Methods**:
@@ -41,6 +46,8 @@ Access public API endpoints without the need for authentication.
 
 ### `CoinbaseAuthenticator`
 A sentinel that ensures every API request is authenticated.
+- **Constructors**:
+  - Accepts either API key and secret or an OAuth2 access token.
 - **Methods**:
   - `SendAuthenticatedRequest`: Directs an authenticated request to the destined path.
   - `SendAuthenticatedRequestAsync`: Asynchronously channels an authenticated request to the designated path.
@@ -99,9 +106,12 @@ The `Coinbase API Wrapper` is accompanied by a suite of tests, ensuring its reli
 
 # Changelog
 
+## v1.4.0 - 2024-JUN-14
+- **Added Support for OAuth2**: Added a new `CoinbaseOauth2Client` class for interacting with the Coinbase REST API using OAuth2 access tokens. Updated `CoinbaseAuthenticator` to include an overloaded constructor that accepts an OAuth2 access token. **Note**: OAuth2 does not support WebSocket connections.
+- **Order Function Overloads**: Added overloads for order functions to return the `Order` object, enhancing the functionality of methods like `CreateMarketOrderAsync`, `CreateLimitOrderGTCAsync`, `CreateLimitOrderGTDAsync`, `CreateStopLimitOrderGTCAsync`, `CreateStopLimitOrderGTDAsync`, and `CreateSORLimitIOCOrderAsync`. These overloads require the `returnOrder` parameter to be set to `true` to return the full order details.
+
 ## v1.3.1 - 2024-JUN-04
 - **Reverted CoinbaseClient Constructor to Include Legacy API Key Type**: The `CoinbaseClient` constructor again includes the `ApiKeyType` of `Legacy`, but `CoinbaseDeveloperPlatform` is now the default. **This may be a breaking change and can be fixed by supplying the constuctor with an ApiKeyType = Legacy**.
-
 
 ## v1.3 - 2024-MAY-30
 - **Removed Legacy API Keys**: The wrapper now only supports Coinbase Developer Platform (CDP) API keys due to Coinbase removing legacy keys after an extended timeline, effective June 10, 2024. **This is a breaking change**
