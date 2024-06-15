@@ -95,8 +95,9 @@ Specialized in managing WebSocket communications for real-time updates from the 
 
 # Changelog
 
-## v1.4.0 - 2024-JUN-10
+## v1.4.0 - 2024-JUN-15
 - **Added Support for OAuth2**: Added a new `CoinbaseOauth2Client` class for interacting with the Coinbase REST API using OAuth2 access tokens. Updated `CoinbaseAuthenticator` to include an overloaded constructor that accepts an OAuth2 access token. **Note**: OAuth2 does not support WebSocket connections.
+- **Order Function Overloads**: Added overloads for order functions to return the `Order` object, enhancing the functionality of methods like `CreateMarketOrderAsync`, `CreateLimitOrderGTCAsync`, `CreateLimitOrderGTDAsync`, `CreateStopLimitOrderGTCAsync`, `CreateStopLimitOrderGTDAsync`, and `CreateSORLimitIOCOrderAsync`. These overloads require the `returnOrder` parameter to be set to `true` to return the full order details.
 
 ## v1.3.1 - 2024-JUN-04
 - **Reverted CoinbaseClient Constructor to Include Legacy API Key Type**: The `CoinbaseClient` constructor again includes the `ApiKeyType` of `Legacy`, but `CoinbaseDeveloperPlatform` is now the default. **This may be a breaking change and can be fixed by supplying the constructor with an ApiKeyType = Legacy**.

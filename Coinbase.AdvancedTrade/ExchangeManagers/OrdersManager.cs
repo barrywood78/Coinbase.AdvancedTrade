@@ -285,7 +285,45 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
         }
 
+        /// <summary>
+        /// Attempts to retrieve an order by its ID with retry logic, allowing for retries if the order is not immediately available.
+        /// </summary>
+        /// <param name="orderId">The ID of the order to retrieve.</param>
+        /// <param name="maxRetries">The maximum number of retry attempts. Default is 20.</param>
+        /// <param name="delay">The delay in milliseconds between retries. Default is 500ms.</param>
+        /// <returns>The <see cref="Order"/> object if successfully retrieved; otherwise, null.</returns>
+        /// <exception cref="ArgumentException">Thrown when the order ID is null.</exception>
+        private async Task<Order> GetOrderWithRetryAsync(string orderId, int maxRetries = 20, int delay = 500)
+        {
+            // Validate input parameters
+            if (string.IsNullOrWhiteSpace(orderId))
+            {
+                throw new ArgumentException("Order ID cannot be null", nameof(orderId));
+            }
 
+            Order order = null; 
+            int retryCount = 0; 
+
+            // Loop to retry fetching the order details
+            while (retryCount < maxRetries)
+            {
+                // Attempt to get the order details
+                order = await GetOrderAsync(orderId);
+                if (order != null)
+                {
+                    // Break the loop if the order is successfully retrieved
+                    break;
+                }
+
+                // Increment the retry count
+                retryCount++;
+
+                // Wait for the specified delay before retrying
+                await Task.Delay(delay);
+            }
+
+            return order; // Return the order (or null if not retrieved within the retries)
+        }
 
 
         /// <inheritdoc/>
@@ -320,6 +358,19 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
             // Call the underlying order creation method with the prepared configuration
             return await CreateOrderAsync(productId, side, orderConfiguration);
+        }
+
+        /// <inheritdoc/>
+        public async Task<Order> CreateMarketOrderAsync(string productId, OrderSide side, string amount, bool returnOrder = true)
+        {
+            if (!returnOrder)
+            {
+                throw new ArgumentException("returnOrder must be true to return an Order object.", nameof(returnOrder));
+            }
+
+            string orderId = await CreateMarketOrderAsync(productId, side, amount);
+
+            return await GetOrderWithRetryAsync(orderId);
         }
 
 
@@ -361,6 +412,19 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             return await CreateOrderAsync(productId, side, orderConfiguration);
         }
 
+
+        /// <inheritdoc/>
+        public async Task<Order> CreateLimitOrderGTCAsync(string productId, OrderSide side, string baseSize, string limitPrice, bool postOnly, bool returnOrder = true)
+        {
+            if (!returnOrder)
+            {
+                throw new ArgumentException("returnOrder must be true to return an Order object.", nameof(returnOrder));
+            }
+
+            string orderId = await CreateLimitOrderGTCAsync(productId, side, baseSize, limitPrice, postOnly);
+
+            return await GetOrderWithRetryAsync(orderId);
+        }
 
 
         /// <inheritdoc/>
@@ -405,6 +469,19 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             return await CreateOrderAsync(productId, side, orderConfig);
         }
 
+
+        /// <inheritdoc/>
+        public async Task<Order> CreateLimitOrderGTDAsync(string productId, OrderSide side, string baseSize, string limitPrice, DateTime endTime, bool postOnly = true, bool returnOrder = true)
+        {
+            if (!returnOrder)
+            {
+                throw new ArgumentException("returnOrder must be true to return an Order object.", nameof(returnOrder));
+            }
+
+            string orderId = await CreateLimitOrderGTCAsync(productId, side, baseSize, limitPrice, postOnly);
+
+            return await GetOrderWithRetryAsync(orderId);
+        }
 
 
         /// <inheritdoc/>
@@ -460,6 +537,20 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
             // Delegate the actual order creation to the general-purpose method with the constructed configuration
             return await CreateOrderAsync(productId, side, orderConfig);
+        }
+
+
+        /// <inheritdoc/>
+        public async Task<Order> CreateStopLimitOrderGTCAsync(string productId, OrderSide side, string baseSize, string limitPrice, string stopPrice, bool returnOrder = true)
+        {
+            if (!returnOrder)
+            {
+                throw new ArgumentException("returnOrder must be true to return an Order object.", nameof(returnOrder));
+            }
+
+            string orderId = await CreateStopLimitOrderGTCAsync(productId, side, baseSize, limitPrice, stopPrice);
+
+            return await GetOrderWithRetryAsync(orderId);
         }
 
 
@@ -526,6 +617,19 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
         }
 
 
+        /// <inheritdoc/>
+        public async Task<Order> CreateStopLimitOrderGTDAsync(string productId, OrderSide side, string baseSize, string limitPrice, string stopPrice, DateTime endTime, bool returnOrder = true)
+        {
+            if (!returnOrder)
+            {
+                throw new ArgumentException("returnOrder must be true to return an Order object.", nameof(returnOrder));
+            }
+
+            string orderId = await CreateStopLimitOrderGTDAsync(productId, side, baseSize, limitPrice, stopPrice, endTime);
+
+            return await GetOrderWithRetryAsync(orderId);
+        }
+
 
         /// <inheritdoc/>
         public async Task<string> CreateSORLimitIOCOrderAsync(string productId, OrderSide side, string baseSize, string limitPrice)
@@ -558,6 +662,20 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
             // Delegate the actual order creation to the general-purpose method with the prepared configuration
             return await CreateOrderAsync(productId, side, orderConfiguration);
+        }
+
+
+        /// <inheritdoc/>
+        public async Task<Order> CreateSORLimitIOCOrderAsync(string productId, OrderSide side, string baseSize, string limitPrice, bool returnOrder = true)
+        {
+            if (!returnOrder)
+            {
+                throw new ArgumentException("returnOrder must be true to return an Order object.", nameof(returnOrder));
+            }
+
+            string orderId = await CreateSORLimitIOCOrderAsync(productId, side, baseSize, limitPrice);
+
+            return await GetOrderWithRetryAsync(orderId);
         }
 
 
