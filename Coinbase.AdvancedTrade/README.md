@@ -95,6 +95,24 @@ Specialized in managing WebSocket communications for real-time updates from the 
 
 # Changelog
 
+## v1.5.0 - [Current Date]
+
+### Changed
+- Updated `ListOrdersAsync` and `ListFillsAsync` methods to align with recent Coinbase API changes:
+  - Replaced singular parameters with plural versions for better future compatibility.
+  - Added new filters and sorting options.
+  - Maintained backward compatibility through method overloads.
+
+### Added
+- New `ListOrdersSortBy` enum with options: `LIMIT_PRICE`, `LAST_FILL_TIME`.
+- New `ListFillsSortBy` enum with options: `PRICE`, `TRADE_TIME`.
+- New `orderIds` parameter in `ListOrdersAsync` for filtering by specific order IDs.
+- New `tradeIds` parameter in `ListFillsAsync` for filtering by specific trade IDs.
+
+### Deprecated
+- Old signatures for `ListOrdersAsync` and `ListFillsAsync` are now marked as obsolete. They will continue to work but users are encouraged to migrate to the new signatures.
+
+
 ## v1.4.0 - 2024-JUN-14
 - **Added Support for OAuth2**: Added a new `CoinbaseOauth2Client` class for interacting with the Coinbase REST API using OAuth2 access tokens. Updated `CoinbaseAuthenticator` to include an overloaded constructor that accepts an OAuth2 access token. **Note**: OAuth2 does not support WebSocket connections.
 - **Order Function Overloads**: Added overloads for order functions to return the `Order` object, enhancing the functionality of methods like `CreateMarketOrderAsync`, `CreateLimitOrderGTCAsync`, `CreateLimitOrderGTDAsync`, `CreateStopLimitOrderGTCAsync`, `CreateStopLimitOrderGTDAsync`, and `CreateSORLimitIOCOrderAsync`. These overloads require the `returnOrder` parameter to be set to `true` to return the full order details.

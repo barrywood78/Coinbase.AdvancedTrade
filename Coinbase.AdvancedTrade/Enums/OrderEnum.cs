@@ -67,4 +67,36 @@
         /// </summary>
         SELL
     }
+
+    /// <summary>
+    /// Options for sort_by parameter for List Orders (Default is Creation Time)
+    /// </summary>
+    public enum ListOrdersSortBy
+    {
+        /// <summary>
+        /// Sort by Limit Price
+        /// </summary>
+        LIMIT_PRICE,
+
+        /// <summary>
+        /// Sort by Last Fill Time
+        /// </summary>
+        LAST_FILL_TIME
+    }
+
+    /// <summary>
+    /// Options for sort_by parameter for List Fills (Default is Creation Time)
+    /// </summary>
+    public enum ListFillsSortBy
+    {
+        /// <summary>
+        /// Sort by Price
+        /// </summary>
+        PRICE,
+
+        /// <summary>
+        /// Sort by Trade Time
+        /// </summary>
+        TRADE_TIME
+    }
 }

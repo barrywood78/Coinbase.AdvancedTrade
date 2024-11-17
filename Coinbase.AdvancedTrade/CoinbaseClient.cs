@@ -59,7 +59,7 @@ namespace Coinbase.AdvancedTrade
             Public = new PublicManager(authenticator);
 
             // Initialize WebSocketManager for real-time data feed
-            WebSocket = new WebSocketManager("wss://advanced-trade-ws.coinbase.com", apiKey, apiSecret, websocketBufferSize, apiKeyType);
+            WebSocket = new WebSocketManager(apiKey, apiSecret, websocketBufferSize, apiKeyType);
         }
 
     }

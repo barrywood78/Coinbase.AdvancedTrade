@@ -19,8 +19,10 @@ namespace Coinbase.AdvancedTrade
     /// </summary>
     public sealed class WebSocketManager : IDisposable
     {
-        // WebSocket instance for managing the WebSocket connection.
-        private readonly ClientWebSocket _webSocket = new ClientWebSocket();
+        private readonly ClientWebSocket _marketDataWebSocket = new ClientWebSocket();
+        private readonly ClientWebSocket _userOrderDataWebSocket = new ClientWebSocket();
+        private readonly Uri _marketDataUri = new Uri("wss://advanced-trade-ws.coinbase.com");
+        private readonly Uri _userOrderDataUri = new Uri("wss://advanced-trade-ws-user.coinbase.com");
 
         // The URI of the WebSocket server.
         private readonly Uri _webSocketUri;
@@ -102,7 +104,7 @@ namespace Coinbase.AdvancedTrade
         /// <param name="apiSecret">The API secret used for authentication.</param>
         /// <param name="bufferSize">The buffer size for receiving messages, in bytes (default is 5,242,880 bytes or 5MB).</param>
         /// <param name="apiKeyType">Specifies the type of API key used. This can be either a Legacy key (Depricated) or a Coinbase Developer Platform (CDP) key.</param>
-        public WebSocketManager(string webSocketUri, string apiKey, string apiSecret, int bufferSize = 5 * 1024 * 1024, ApiKeyType apiKeyType = ApiKeyType.CoinbaseDeveloperPlatform)
+        public WebSocketManager(string apiKey, string apiSecret, int bufferSize = 5 * 1024 * 1024, ApiKeyType apiKeyType = ApiKeyType.CoinbaseDeveloperPlatform)
         {
             // Check for null or empty values and throw exceptions if necessary.
             if (string.IsNullOrWhiteSpace(webSocketUri)) throw new ArgumentNullException(nameof(webSocketUri));

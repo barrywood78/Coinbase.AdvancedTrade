@@ -14,6 +14,29 @@ namespace Coinbase.AdvancedTrade.Interfaces
         /// <summary>
         /// Asynchronously lists orders based on the provided criteria.
         /// </summary>
+        /// <param name="productIds">Optional array of product IDs to filter the results.</param>
+        /// <param name="orderStatus">Optional array of order statuses to filter the results.</param>
+        /// <param name="startDate">Optional start date to filter the results.</param>
+        /// <param name="endDate">Optional end date to filter the results.</param>
+        /// <param name="orderTypes">Optional array of order types to filter the results.</param>
+        /// <param name="orderSide">Optional order side to filter the results.</param>
+        /// <param name="orderIds">Optional array of order IDs to filter the results.</param>
+        /// <param name="sortBy">Optional sortBy to sort the results. Default is Creation Time</param>
+        /// <returns>A task representing the operation. The task result contains a list of orders that match the given criteria.</returns>
+        Task<List<Order>> ListOrdersAsync(
+            string[] productIds = null,
+            OrderStatus[] orderStatus = null,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
+            OrderType[] orderTypes = null,
+            OrderSide? orderSide = null,
+            string[] orderIds = null,
+            ListOrdersSortBy? sortBy = null
+        );
+
+        /// <summary>
+        /// Asynchronously lists orders based on the provided criteria (backward-compatible version).
+        /// </summary>
         /// <param name="productId">Optional product ID to filter the results.</param>
         /// <param name="orderStatus">Optional array of order statuses to filter the results.</param>
         /// <param name="startDate">Optional start date to filter the results.</param>
@@ -21,6 +44,7 @@ namespace Coinbase.AdvancedTrade.Interfaces
         /// <param name="orderType">Optional order type to filter the results.</param>
         /// <param name="orderSide">Optional order side to filter the results.</param>
         /// <returns>A task representing the operation. The task result contains a list of orders that match the given criteria.</returns>
+        [Obsolete("Use the new ListOrdersAsync method with array parameters for future compatibility", false)]
         Task<List<Order>> ListOrdersAsync(
             string productId = null,
             OrderStatus[] orderStatus = null,
@@ -33,11 +57,31 @@ namespace Coinbase.AdvancedTrade.Interfaces
         /// <summary>
         /// Asynchronously lists fills based on the provided criteria.
         /// </summary>
+        /// <param name="orderIds">Optional array of order IDs to filter the results.</param>
+        /// <param name="productIds">Optional array of product IDs to filter the results.</param>
+        /// <param name="startSequenceTimestamp">Optional start timestamp to filter the results.</param>
+        /// <param name="endSequenceTimestamp">Optional end timestamp to filter the results.</param>
+        /// <param name="tradeIds">Optional array of trade IDs to filter the results.</param>
+        /// <param name="sortBy">Optional sortBy to sort the results. Default is Creation Time</param>
+        /// <returns>A task representing the operation. The task result contains a list of fills that match the given criteria.</returns>
+        Task<List<Fill>> ListFillsAsync(
+            string[] orderIds = null,
+            string[] productIds = null,
+            DateTime? startSequenceTimestamp = null,
+            DateTime? endSequenceTimestamp = null,
+            string[] tradeIds = null,
+            ListFillsSortBy? sortBy = null
+        );
+
+        /// <summary>
+        /// Asynchronously lists fills based on the provided criteria (backward-compatible version).
+        /// </summary>
         /// <param name="orderId">Optional order ID to filter the results.</param>
         /// <param name="productId">Optional product ID to filter the results.</param>
         /// <param name="startSequenceTimestamp">Optional start timestamp to filter the results.</param>
         /// <param name="endSequenceTimestamp">Optional end timestamp to filter the results.</param>
         /// <returns>A task representing the operation. The task result contains a list of fills that match the given criteria.</returns>
+        [Obsolete("Use the new ListFillsAsync method with array parameters for future compatibility", false)]
         Task<List<Fill>> ListFillsAsync(
             string orderId = null,
             string productId = null,

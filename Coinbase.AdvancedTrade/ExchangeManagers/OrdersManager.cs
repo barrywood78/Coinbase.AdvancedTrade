@@ -32,12 +32,14 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
         /// <inheritdoc/>
         public async Task<List<Order>> ListOrdersAsync(
-            string productId = null,
+            string[] productIds = null,
             OrderStatus[] orderStatus = null,
             DateTime? startDate = null,
             DateTime? endDate = null,
-            OrderType? orderType = null,
-            OrderSide? orderSide = null)
+            OrderType[] orderTypes = null,
+            OrderSide? orderSide = null,
+            string[] orderIds = null,
+            ListOrdersSortBy? sortBy = null)
         {
             // Guard against invalid OrderStatus combinations
             ValidateOrderStatus(orderStatus);
@@ -46,18 +48,20 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             string[] orderStatusStrings = UtilityHelper.EnumToStringArray(orderStatus);
             string startDateString = UtilityHelper.FormatDateToISO8601(startDate);
             string endDateString = UtilityHelper.FormatDateToISO8601(endDate);
-            string orderTypeString = orderType?.ToString();
+            string[] orderTypesString = UtilityHelper.EnumToStringArray(orderTypes);
             string orderSideString = orderSide?.ToString();
 
             // Create an anonymous object with the parameters
             var paramsObj = new
             {
-                product_id = productId,
+                product_ids = productIds,
                 order_status = orderStatusStrings,
                 start_date = startDateString,
                 end_date = endDateString,
-                order_type = orderTypeString,
-                order_side = orderSideString
+                order_types = orderTypesString,
+                order_side = orderSideString,
+                order_ids = orderIds,
+                sort_by = sortBy
             };
 
             try
@@ -73,6 +77,27 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             }
         }
 
+        /// <summary>
+        /// Backward-compatible overload for ListOrdersAsync.
+        /// </summary>
+        [Obsolete("Use the new ListOrdersAsync method with array parameters for future compatibility", false)]
+        public async Task<List<Order>> ListOrdersAsync(
+            string productId = null,
+            OrderStatus[] orderStatus = null,
+            DateTime? startDate = null,
+            DateTime? endDate = null,
+            OrderType? orderType = null,
+            OrderSide? orderSide = null)
+        {
+            return await ListOrdersAsync(
+                productIds: productId != null ? new[] { productId } : null,
+                orderStatus: orderStatus,
+                startDate: startDate,
+                endDate: endDate,
+                orderTypes: orderType.HasValue ? new[] { orderType.Value } : null,
+                orderSide: orderSide);
+        }
+
         private static void ValidateOrderStatus(OrderStatus[] orderStatus)
         {
             if (orderStatus != null && orderStatus.Contains(OrderStatus.OPEN) && orderStatus.Length > 1)
@@ -83,11 +108,14 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
 
 
         /// <inheritdoc/>
+        /// <inheritdoc/>
         public async Task<List<Fill>> ListFillsAsync(
-            string orderId = null,
-            string productId = null,
+            string[] orderIds = null,
+            string[] productIds = null,
             DateTime? startSequenceTimestamp = null,
-            DateTime? endSequenceTimestamp = null)
+            DateTime? endSequenceTimestamp = null,
+            string[] tradeIds = null,
+            ListFillsSortBy? sortBy = null)
         {
             // Convert DateTime to the desired ISO8601 format
             string startSequenceTimestampString = UtilityHelper.FormatDateToISO8601(startSequenceTimestamp);
@@ -96,10 +124,12 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
             // Prepare request parameters using anonymous type
             var paramsObj = new
             {
-                order_id = orderId,
-                product_id = productId,
+                order_ids = orderIds,
+                product_ids = productIds,
                 start_sequence_timestamp = startSequenceTimestampString,
-                end_sequence_timestamp = endSequenceTimestampString
+                end_sequence_timestamp = endSequenceTimestampString,
+                trade_ids = tradeIds,
+                sort_by = sortBy
             };
 
             try
@@ -116,6 +146,23 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                 // Rethrow exception with additional context
                 throw new InvalidOperationException("Failed to list fills", ex);
             }
+        }
+
+        /// <summary>
+        /// Backward-compatible overload for ListFillsAsync.
+        /// </summary>
+        [Obsolete("Use the new ListFillsAsync method with array parameters for future compatibility", false)]
+        public async Task<List<Fill>> ListFillsAsync(
+            string orderId = null,
+            string productId = null,
+            DateTime? startSequenceTimestamp = null,
+            DateTime? endSequenceTimestamp = null)
+        {
+            return await ListFillsAsync(
+                orderIds: orderId != null ? new[] { orderId } : null,
+                productIds: productId != null ? new[] { productId } : null,
+                startSequenceTimestamp: startSequenceTimestamp,
+                endSequenceTimestamp: endSequenceTimestamp);
         }
 
 
@@ -822,8 +869,6 @@ namespace Coinbase.AdvancedTrade.ExchangeManagers
                 throw new InvalidOperationException("Failed to preview order edit due to an exception.", ex);
             }
         }
-
-
 
     }
 }
