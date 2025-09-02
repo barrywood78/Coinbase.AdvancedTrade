@@ -7,7 +7,7 @@ namespace Coinbase.AdvancedTrade
     /// <summary>
     /// Provides access to various functionalities of the Coinbase API.
     /// </summary>
-    public sealed class CoinbaseClient
+    public sealed class CoinbaseClient : ICoinbaseClient
     {
         /// <summary>
         /// Gets the accounts manager, responsible for account-related operations.
