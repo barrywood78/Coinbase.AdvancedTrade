@@ -163,6 +163,10 @@ namespace Coinbase.AdvancedTrade
 
                 return HandleResponse(response);
             }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new InvalidOperationException("An error occurred while executing the request.", ex);
@@ -176,6 +180,13 @@ namespace Coinbase.AdvancedTrade
         /// <returns>A dictionary representation of the response content, or null if the content is empty or only consists of white-space characters.</returns>
         private static Dictionary<string, object> HandleResponse(RestResponse response)
         {
+            if (!response.IsSuccessful)
+            {
+                throw new InvalidOperationException(
+                    $"Coinbase API request failed with status code {response.StatusCode.ToString("D")} {response.StatusDescription}. Response: {response.Content}",
+                    response.ErrorException);
+            }
+
             // Check if the response content is empty or just white-space
             if (string.IsNullOrWhiteSpace(response.Content))
             {
